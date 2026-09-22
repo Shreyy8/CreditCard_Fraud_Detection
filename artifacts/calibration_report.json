@@ -1,0 +1,86 @@
+{
+  "fit_cutoff_exclusive": "2016-10-01 00:00:00",
+  "holdout_start_inclusive": "2016-10-01 00:00:00",
+  "holdout_cutoff_exclusive": "2016-11-01 00:00:00",
+  "fit_n": 4193,
+  "holdout_n": 1347,
+  "raw_brier": 0.19843298,
+  "calibrated_brier": 0.05055723,
+  "apply_calibrator": true,
+  "raw_reliability": [
+    {
+      "bin_range": "0.2-0.3",
+      "n": 36,
+      "mean_predicted": 0.272254,
+      "actual_fraud_rate": 1.0,
+      "gap": -0.727746
+    },
+    {
+      "bin_range": "0.3-0.4",
+      "n": 337,
+      "mean_predicted": 0.353069,
+      "actual_fraud_rate": 0.5727,
+      "gap": -0.219631
+    },
+    {
+      "bin_range": "0.4-0.5",
+      "n": 213,
+      "mean_predicted": 0.449966,
+      "actual_fraud_rate": 1.0,
+      "gap": -0.550034
+    },
+    {
+      "bin_range": "0.5-0.6",
+      "n": 203,
+      "mean_predicted": 0.553323,
+      "actual_fraud_rate": 1.0,
+      "gap": -0.446677
+    },
+    {
+      "bin_range": "0.6-0.7",
+      "n": 237,
+      "mean_predicted": 0.649441,
+      "actual_fraud_rate": 1.0,
+      "gap": -0.350559
+    },
+    {
+      "bin_range": "0.7-0.8",
+      "n": 202,
+      "mean_predicted": 0.747356,
+      "actual_fraud_rate": 1.0,
+      "gap": -0.252644
+    },
+    {
+      "bin_range": "0.8-0.9",
+      "n": 95,
+      "mean_predicted": 0.841383,
+      "actual_fraud_rate": 1.0,
+      "gap": -0.158617
+    },
+    {
+      "bin_range": "0.9-1.0",
+      "n": 24,
+      "mean_predicted": 0.94373,
+      "actual_fraud_rate": 1.0,
+      "gap": -0.05627
+    }
+  ],
+  "calibrated_reliability": [
+    {
+      "bin_range": "0.3-0.4",
+      "n": 260,
+      "mean_predicted": 0.324397,
+      "actual_fraud_rate": 0.446154,
+      "gap": -0.121757
+    },
+    {
+      "bin_range": "0.9-1.0",
+      "n": 1087,
+      "mean_predicted": 1.0,
+      "actual_fraud_rate": 1.0,
+      "gap": 0.0
+    }
+  ],
+  "calibrator_knots": 3075,
+  "source_predictions": "artifacts\\backtest_predictions.csv"
+}

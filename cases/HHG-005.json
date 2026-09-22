@@ -1,9 +1,11 @@
 {
   "case_id": "HHG-005",
+  "schema_version": "1.0",
+  "policy_version": "1.0",
   "case": {
     "status": "open",
     "verdict": "uncertain",
-    "fraud_probability": 0.72,
+    "fraud_probability": 1.0,
     "pattern": "card_not_present_new_device",
     "pattern_description": "",
     "affected_txn_ids": [
@@ -30,7 +32,8 @@
     ],
     "summary": "Local detectors found pattern card_not_present_new_device for flagged transaction 3523199. Evidence includes 1 affected transaction(s) and 0 connected card(s).",
     "written_to_graph": false,
-    "graph_case_id": ""
+    "graph_case_id": "",
+    "fraud_probability_raw": 0.72
   },
   "evidence_requests": [],
   "next_best_actions": {

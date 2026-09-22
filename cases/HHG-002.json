@@ -1,9 +1,11 @@
 {
   "case_id": "HHG-002",
+  "schema_version": "1.0",
+  "policy_version": "1.0",
   "case": {
     "status": "open",
     "verdict": "uncertain",
-    "fraud_probability": 0.79,
+    "fraud_probability": 1.0,
     "pattern": "none",
     "pattern_description": "",
     "affected_txn_ids": [],
@@ -17,7 +19,8 @@
     ],
     "summary": "Local detectors found pattern none for flagged transaction 3478782. Evidence includes 0 affected transaction(s) and 0 connected card(s).",
     "written_to_graph": false,
-    "graph_case_id": ""
+    "graph_case_id": "",
+    "fraud_probability_raw": 0.79
   },
   "evidence_requests": [],
   "next_best_actions": {

@@ -30,6 +30,8 @@ VERDICTS = {"fraud", "legitimate", "uncertain"}
 SOURCES = {"graph", "document", "customer", "external"}
 REQUEST_TYPES = {"customer_validation", "step_up_auth", "analyst_info"}
 FLOAT_TOLERANCE = 0.02
+SCHEMA_VERSION = "1.0"
+POLICY_VERSION = "1.0"
 
 
 @dataclass(frozen=True)
@@ -116,8 +118,12 @@ def _actions(values: Any, path: str, errors: list[str]) -> None:
 def validate_answer(answer: dict[str, Any], index: DatasetIndex) -> list[str]:
     """Return validation errors; an empty list means the answer is valid."""
     errors: list[str] = []
-    required_top = {"case_id", "case", "evidence_requests", "next_best_actions", "sar", "stop_reason", "tool_calls", "tokens", "latency_s"}
+    required_top = {"case_id", "schema_version", "policy_version", "case", "evidence_requests", "next_best_actions", "sar", "stop_reason", "tool_calls", "tokens", "latency_s"}
     errors.extend(f"top-level: missing '{key}'" for key in sorted(required_top - set(answer)))
+    if answer.get("schema_version") != SCHEMA_VERSION:
+        errors.append(f"schema_version: expected '{SCHEMA_VERSION}'")
+    if answer.get("policy_version") != POLICY_VERSION:
+        errors.append(f"policy_version: expected '{POLICY_VERSION}'")
     case_id = answer.get("case_id")
     if case_id not in index.case_ids:
         errors.append(f"case_id: unknown case '{case_id}'")
@@ -224,6 +230,9 @@ def validate_answer(answer: dict[str, Any], index: DatasetIndex) -> list[str]:
         if sar.get("file"):
             if not sar.get("narrative") or not sar.get("subjects") or len(sar.get("activity_dates", [])) != 2:
                 errors.append("sar: filed report requires narrative, subjects, and two activity dates")
+            sentence_count = sum(1 for character in sar.get("narrative", "") if character in ".!?" )
+            if not 6 <= sentence_count <= 12:
+                errors.append("sar.narrative: filed report must contain 6 to 12 sentences")
         elif sar.get("narrative") != "" or sar.get("subjects") != [] or sar.get("total_amount_usd") != 0 or sar.get("activity_dates") != []:
             errors.append("sar: non-filed report must have empty narrative, subjects, amount, and dates")
 

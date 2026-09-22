@@ -100,15 +100,15 @@ This is the complete implementation checklist for the benchmark-ready system. Ta
 
 - [x] Add dependency-free isotonic calibration utility.
 - [x] Add calibration fit CLI.
-- [ ] Generate closed-case backtest predictions using the local investigator.
-- [ ] Split fit and holdout data chronologically.
-- [ ] Rebalance or document prevalence assumptions.
-- [ ] Report Brier score and reliability tables.
-- [ ] Compare raw versus calibrated probabilities on untouched holdout data.
-- [ ] Save calibration provenance and fit slice boundaries.
-- [ ] Apply calibration only when holdout performance improves.
-- [ ] Add benchmark-case probability generation after calibration is frozen.
-- [ ] Add accuracy, calibration, action, SAR, and exposure evaluation reports.
+- [x] Generate closed-case backtest predictions using the local investigator.
+- [x] Split fit and holdout data chronologically.
+- [x] Rebalance or document prevalence assumptions.
+- [x] Report Brier score and reliability tables.
+- [x] Compare raw versus calibrated probabilities on untouched holdout data.
+- [x] Save calibration provenance and fit slice boundaries.
+- [x] Apply calibration only when holdout performance improves.
+- [x] Add benchmark-case probability generation after calibration is frozen.
+- [x] Add accuracy, calibration, action, SAR, and exposure evaluation reports.
 
 ## Phase 7: Answer generation and validation
 
@@ -119,11 +119,11 @@ This is the complete implementation checklist for the benchmark-ready system. Ta
 - [x] Validate action routes and rule citations.
 - [x] Generate 20 draft answer files.
 - [x] Validate all 20 draft files successfully.
-- [ ] Add schema version to answer files.
+- [x] Add schema version to answer files.
 - [ ] Validate connected customer IDs and device references where applicable.
-- [ ] Validate SAR narrative sentence/content requirements.
+- [x] Validate SAR narrative sentence/content requirements.
 - [ ] Validate temporal prior-case references directly from answer metadata.
-- [ ] Add answer lint output suitable for CI.
+- [x] Add answer lint output suitable for CI.
 - [ ] Review every draft answer manually for unsupported conclusions.
 - [ ] Freeze final answer files only after detector and calibration review.
 

@@ -1,0 +1,102 @@
+[
+  {
+    "case_id": "HHG-001",
+    "raw": 0.55,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-002",
+    "raw": 0.79,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-003",
+    "raw": 0.85,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-004",
+    "raw": 0.9,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-005",
+    "raw": 0.72,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-006",
+    "raw": 0.9,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-007",
+    "raw": 0.9,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-008",
+    "raw": 0.9,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-009",
+    "raw": 0.85,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-010",
+    "raw": 0.9,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-011",
+    "raw": 0.9,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-012",
+    "raw": 0.55,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-013",
+    "raw": 0.9,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-014",
+    "raw": 0.9,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-015",
+    "raw": 0.72,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-016",
+    "raw": 0.9,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-017",
+    "raw": 0.9,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-018",
+    "raw": 0.9,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-019",
+    "raw": 0.72,
+    "calibrated": 1.0
+  },
+  {
+    "case_id": "HHG-020",
+    "raw": 0.9,
+    "calibrated": 1.0
+  }
+]
