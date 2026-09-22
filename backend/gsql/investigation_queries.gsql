@@ -1,0 +1,196 @@
+// ============================================================
+// TigerGraph GSQL — Fraud Investigation Queries
+// Graph    : FraudCaseGraph
+// TG Ver   : 4.2.5  (Savanna)
+// Verified : syntax tested against live workspace 2026-09-20
+//
+// Vertex types : FraudCase, Transaction, Card, Customer, Identity
+// Edge types   :
+//   case_flagged_transaction              FraudCase  -> Transaction
+//   case_involves_card                   FraudCase  -> Card
+//   case_involves_customer               FraudCase  -> Customer
+//   closed_case_involves_customer        FraudCase  -> Customer
+//   closed_case_involves_card            FraudCase  -> Card
+//   closed_case_first_fraud_transaction  FraudCase  -> Transaction
+//   transaction_belongs_to_card          Transaction -> Card
+//   transaction_belongs_to_customer      Transaction -> Customer
+//   transaction_has_identity             Transaction -> Identity
+//
+// Primary-ID lookup pattern (V1 compatible):
+//   VERTEX src = TO_VERTEX(id_param, "VertexType");
+//   SeedSet = {src};
+//
+// Reverse-edge traversal: use the edge name with :e alias — works both ways.
+// ============================================================
+
+// ── 1. Transaction_Fraud — main entry-point query ─────────────────────────────
+CREATE OR REPLACE QUERY Transaction_Fraud(VERTEX<Transaction> txn) FOR GRAPH FraudCaseGraph {
+  SeedSet = {txn};
+  T = SELECT t FROM SeedSet:t;
+
+  Cards = SELECT c FROM SeedSet:t -(transaction_belongs_to_card)- Card:c;
+  Customers = SELECT cu FROM SeedSet:t -(transaction_belongs_to_customer)- Customer:cu;
+  Identities = SELECT i FROM SeedSet:t -(transaction_has_identity)- Identity:i;
+
+  PRINT T, Cards, Customers, Identities;
+}
+
+// ── 2. get_transaction_context — full neighbourhood ──────────────────────────
+CREATE OR REPLACE QUERY get_transaction_context(VERTEX<Transaction> txn) FOR GRAPH FraudCaseGraph {
+  SeedSet = {txn};
+  T = SELECT t FROM SeedSet:t;
+
+  Cards      = SELECT c  FROM SeedSet:t -(transaction_belongs_to_card)-     Card:c;
+  Customers  = SELECT cu FROM SeedSet:t -(transaction_belongs_to_customer)- Customer:cu;
+  Identities = SELECT i  FROM SeedSet:t -(transaction_has_identity)-        Identity:i;
+
+  // FraudCases that flag this transaction
+  Cases = SELECT fc FROM SeedSet:t -(case_flagged_transaction:e)- FraudCase:fc;
+
+  PRINT T, Cards, Customers, Identities, Cases;
+}
+
+// ── 3. get_customer_history — all transactions for a customer ─────────────────
+CREATE OR REPLACE QUERY get_customer_history(VERTEX<Customer> customer, INT lim = 50)
+FOR GRAPH FraudCaseGraph {
+  SeedSet = {customer};
+  C = SELECT c FROM SeedSet:c;
+
+  Txns = SELECT t FROM SeedSet:c -(transaction_belongs_to_customer:e)- Transaction:t
+         ORDER BY t.ts DESC
+         LIMIT lim;
+
+  PRINT C, Txns;
+}
+
+// ── 4. find_connected_cards — cards linked via same customer ──────────────────
+CREATE OR REPLACE QUERY find_connected_cards(VERTEX<Card> card)
+FOR GRAPH FraudCaseGraph {
+  SetAccum<STRING> @@connected;
+  SeedSet = {card};
+
+  // Find customers reachable from any transaction on this card
+  Txns      = SELECT t  FROM SeedSet:c -(transaction_belongs_to_card:e)-     Transaction:t;
+  Customers = SELECT cu FROM Txns:t    -(transaction_belongs_to_customer)-    Customer:cu;
+
+  // Find other cards linked to those customers
+  OtherTxns  = SELECT t2 FROM Customers:cu -(transaction_belongs_to_customer:e)- Transaction:t2;
+  OtherCards = SELECT c2 FROM OtherTxns:t2 -(transaction_belongs_to_card)-       Card:c2
+               WHERE c2 != card
+               ACCUM @@connected += c2;
+
+  PRINT @@connected AS card_ids;
+}
+
+// ── 5. find_shared_identity — transactions sharing the same Identity vertex ───
+CREATE OR REPLACE QUERY find_shared_identity(VERTEX<Transaction> txn)
+FOR GRAPH FraudCaseGraph {
+  MapAccum<STRING, SetAccum<STRING>> @@id_to_txns;
+  SeedSet = {txn};
+
+  Identities = SELECT i  FROM SeedSet:t  -(transaction_has_identity)- Identity:i;
+  OtherTxns  = SELECT t2 FROM Identities:i -(transaction_has_identity:e)- Transaction:t2
+               WHERE t2 != txn
+               ACCUM @@id_to_txns += (i -> t2);
+
+  PRINT OtherTxns, @@id_to_txns AS shared_signals;
+}
+
+// ── 6. find_prior_fraud_cases — closed cases on same customer/card ─────────────
+CREATE OR REPLACE QUERY find_prior_fraud_cases(
+    VERTEX<Customer> customer,
+    VERTEX<Card> card
+) FOR GRAPH FraudCaseGraph {
+  CustSeed = {customer};
+  CardSeed = {card};
+
+  CustomerCases = SELECT fc FROM CustSeed:cu -(closed_case_involves_customer:e)- FraudCase:fc;
+  CardCases     = SELECT fc FROM CardSeed:c  -(closed_case_involves_card:e)-     FraudCase:fc;
+
+  AllCases = CustomerCases UNION CardCases;
+  PRINT AllCases AS cases;
+}
+
+// ── 7. calculate_exposure — sum transaction amounts for flagged txns ──────────
+CREATE OR REPLACE QUERY calculate_exposure(SET<VERTEX<Transaction>> txn_set)
+FOR GRAPH FraudCaseGraph {
+  SumAccum<DOUBLE> @@total;
+  SetAccum<STRING> @@included;
+
+  Seed = {txn_set};
+  T = SELECT t FROM Seed:t
+      ACCUM @@total += abs(t.transaction_amt),
+            @@included += getvid(t);
+
+  PRINT @@total AS exposure_usd, @@included AS included_txns;
+}
+
+// ── 8. get_case_history — full case record with linked entities ───────────────
+CREATE OR REPLACE QUERY get_case_history(VERTEX<FraudCase> fraud_case)
+FOR GRAPH FraudCaseGraph {
+  SeedSet = {fraud_case};
+  FC = SELECT fc FROM SeedSet:fc;
+
+  Txns = SELECT t  FROM SeedSet:fc -(case_flagged_transaction)-  Transaction:t;
+  Cards = SELECT c FROM SeedSet:fc -(case_involves_card)-         Card:c;
+  Cust = SELECT cu FROM SeedSet:fc -(case_involves_customer)-     Customer:cu;
+
+  PRINT FC, Txns, Cards, Cust;
+}
+
+// ── 9. find_behavioral_anomalies — transaction velocity for a card ─────────────
+CREATE OR REPLACE QUERY find_behavioral_anomalies(VERTEX<Card> card)
+FOR GRAPH FraudCaseGraph {
+  SumAccum<INT>   @@count;
+  SumAccum<FLOAT> @@total_amt;
+  MaxAccum<FLOAT> @@max_amt;
+  MinAccum<FLOAT> @@min_amt;
+
+  SeedSet = {card};
+  Txns = SELECT t FROM SeedSet:c -(transaction_belongs_to_card:e)- Transaction:t
+         ORDER BY t.ts DESC
+         LIMIT 100
+         ACCUM @@count += 1,
+               @@total_amt += t.transaction_amt,
+               @@max_amt += t.transaction_amt,
+               @@min_amt += t.transaction_amt;
+
+  PRINT @@count AS txn_count, @@total_amt AS total_amount,
+        @@max_amt AS max_amount, @@min_amt AS min_amount, Txns;
+}
+
+// ── 10. find_card_transactions — recent transactions for a card ────────────────
+CREATE OR REPLACE QUERY find_card_transactions(VERTEX<Card> card, INT lim = 100)
+FOR GRAPH FraudCaseGraph {
+  SeedSet = {card};
+  Txns = SELECT t FROM SeedSet:c -(transaction_belongs_to_card:e)- Transaction:t
+         ORDER BY t.ts DESC
+         LIMIT lim;
+
+  PRINT Txns;
+}
+
+// ── 11. link_fraud_case — connect a FraudCase vertex to its entities ──────────
+CREATE OR REPLACE QUERY link_fraud_case(
+    VERTEX<FraudCase>   fraud_case,
+    VERTEX<Transaction> txn,
+    VERTEX<Card>        card,
+    VERTEX<Customer>    customer
+) FOR GRAPH FraudCaseGraph {
+
+  CaseSeed = {fraud_case};
+  TxnSeed  = {txn};
+  CardSeed = {card};
+  CustSeed = {customer};
+
+  FC = SELECT fc FROM CaseSeed:fc;
+  T  = SELECT t  FROM TxnSeed:t;
+  C  = SELECT c  FROM CardSeed:c;
+  CU = SELECT cu FROM CustSeed:cu;
+
+  INSERT INTO case_flagged_transaction VALUES (FC, T);
+  INSERT INTO case_involves_card        VALUES (FC, C);
+  INSERT INTO case_involves_customer    VALUES (FC, CU);
+
+  PRINT FC, T, C, CU;
+}
