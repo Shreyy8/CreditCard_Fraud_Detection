@@ -1,0 +1,87 @@
+{
+  "case_id": "HHG-015",
+  "case": {
+    "status": "open",
+    "verdict": "uncertain",
+    "fraud_probability": 0.72,
+    "pattern": "card_not_present_new_device",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3464869"
+    ],
+    "first_suspicious_txn_id": "3464869",
+    "connected_card_ids": [],
+    "connected_device_profiles": [],
+    "exposure_usd": 599.94,
+    "evidence": [
+      {
+        "claim": "The flagged online transaction was recorded from a device marked New for the account.",
+        "source": "graph",
+        "ref": "detector:cnp_new_device",
+        "entity_ids": [
+          "3464869"
+        ]
+      },
+      {
+        "claim": "Mixed-channel activity coincides with a new device signal, warranting account-takeover review.",
+        "source": "graph",
+        "ref": "detector:account_takeover",
+        "entity_ids": [
+          "3462385",
+          "3462387",
+          "3462404",
+          "3464869",
+          "3468946"
+        ]
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-0615",
+      "CC-1313",
+      "CC-3886"
+    ],
+    "summary": "Local detectors found pattern card_not_present_new_device for flagged transaction 3464869. Evidence includes 1 affected transaction(s) and 0 connected card(s).",
+    "written_to_graph": false,
+    "graph_case_id": ""
+  },
+  "evidence_requests": [],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "ESCALATE_TO_ANALYST",
+        "route": "auto",
+        "reason": "R8: uncertainty remains with material exposure or conflicting evidence"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R3a: case required by probability or requested evidence"
+      }
+    ],
+    "final": [
+      {
+        "action": "ESCALATE_TO_ANALYST",
+        "route": "auto",
+        "reason": "R8: uncertainty remains with material exposure or conflicting evidence"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R3a: case required by probability or requested evidence"
+      }
+    ],
+    "what_changed": "nothing"
+  },
+  "sar": {
+    "file": false,
+    "reason": "No policy rule requires a suspicious activity report at this stage.",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0,
+    "activity_dates": []
+  },
+  "stop_reason": "Further evidence is required before a policy stop threshold is met.",
+  "tool_calls": 7,
+  "tokens": 0,
+  "latency_s": 0.0
+}

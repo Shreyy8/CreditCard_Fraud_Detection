@@ -1,0 +1,174 @@
+{
+  "case_id": "HHG-010",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 0.9,
+    "pattern": "undocumented",
+    "pattern_description": "Coordinated activity across multiple customers sharing a device profile.",
+    "affected_txn_ids": [
+      "3506725"
+    ],
+    "first_suspicious_txn_id": "3506725",
+    "connected_card_ids": [
+      "C00750-K2",
+      "C02250-K2",
+      "C02716-K2",
+      "C02848-K1",
+      "C03738-K2",
+      "C07185-K2",
+      "C08989-K2",
+      "C10308-K1",
+      "C12897-K1"
+    ],
+    "connected_device_profiles": [
+      "Windows | Windows 10 | edge 16.0 | 1366x768"
+    ],
+    "exposure_usd": 1000.03,
+    "evidence": [
+      {
+        "claim": "A shared device profile connects transactions from multiple customers in the bounded investigation window.",
+        "source": "graph",
+        "ref": "detector:shared_entity",
+        "entity_ids": [
+          "3500844",
+          "3500928",
+          "3500930",
+          "3501023",
+          "3501132",
+          "3501177",
+          "3502901",
+          "3504429",
+          "3504479",
+          "3506263",
+          "3506725",
+          "3507297",
+          "3507806",
+          "3508325",
+          "3509432",
+          "3509711",
+          "3510969",
+          "3511534",
+          "3511576",
+          "3511579"
+        ]
+      },
+      {
+        "claim": "The flagged online transaction was recorded from a device marked New for the account.",
+        "source": "graph",
+        "ref": "detector:cnp_new_device",
+        "entity_ids": [
+          "3506725"
+        ]
+      },
+      {
+        "claim": "Coordinated activity across customers does not fit a single-card documented pattern.",
+        "source": "graph",
+        "ref": "detector:undocumented",
+        "entity_ids": [
+          "3500844",
+          "3500928",
+          "3500930",
+          "3501023",
+          "3501132",
+          "3501177",
+          "3502901",
+          "3504429",
+          "3504479",
+          "3506263",
+          "3506725",
+          "3507297",
+          "3507806",
+          "3508325",
+          "3509432",
+          "3509711",
+          "3510969",
+          "3511534",
+          "3511576",
+          "3511579"
+        ]
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-0873"
+    ],
+    "summary": "Local detectors found pattern undocumented for flagged transaction 3506725. Evidence includes 1 affected transaction(s) and 9 connected card(s).",
+    "written_to_graph": false,
+    "graph_case_id": ""
+  },
+  "evidence_requests": [],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R6: coordinated fraud shares a device"
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "R6: shared device connects multiple cards"
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: monitor cards sharing the device"
+      },
+      {
+        "action": "ESCALATE_TO_ANALYST",
+        "route": "auto",
+        "reason": "R9: undocumented coordinated activity requires analyst review"
+      }
+    ],
+    "final": [
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R6: coordinated fraud shares a device"
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "R6: shared device connects multiple cards"
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: monitor cards sharing the device"
+      },
+      {
+        "action": "ESCALATE_TO_ANALYST",
+        "route": "auto",
+        "reason": "R9: undocumented coordinated activity requires analyst review"
+      }
+    ],
+    "what_changed": "nothing"
+  },
+  "sar": {
+    "file": true,
+    "reason": "R9: coordinated undocumented activity requires a report",
+    "narrative": "Local detectors found pattern undocumented for flagged transaction 3506725. Evidence includes 1 affected transaction(s) and 9 connected card(s).",
+    "subjects": [
+      "C10434",
+      "C10434-K1",
+      "C00750-K2",
+      "C02250-K2",
+      "C02716-K2",
+      "C02848-K1",
+      "C03738-K2",
+      "C07185-K2",
+      "C08989-K2",
+      "C10308-K1",
+      "C12897-K1"
+    ],
+    "total_amount_usd": 1000.03,
+    "activity_dates": [
+      "2016-12-02",
+      "2016-12-02"
+    ]
+  },
+  "stop_reason": "Probability crossed a policy threshold with at least two independent evidence items.",
+  "tool_calls": 7,
+  "tokens": 0,
+  "latency_s": 0.0
+}

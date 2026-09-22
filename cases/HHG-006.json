@@ -1,0 +1,191 @@
+{
+  "case_id": "HHG-006",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 0.9,
+    "pattern": "undocumented",
+    "pattern_description": "Coordinated activity across multiple customers sharing a device profile.",
+    "affected_txn_ids": [
+      "3476602",
+      "3476633",
+      "3476665",
+      "3476682"
+    ],
+    "first_suspicious_txn_id": "3476602",
+    "connected_card_ids": [
+      "C01982-K2",
+      "C02859-K1",
+      "C04108-K2",
+      "C05244-K1",
+      "C07171-K2",
+      "C10448-K1",
+      "C11193-K1",
+      "C11385-K1",
+      "C11865-K1",
+      "C13086-K2"
+    ],
+    "connected_device_profiles": [
+      "Trident/7.0 | Windows 7 | ie 11.0 for desktop | 1920x1080",
+      "iOS Device | iOS 11.2.1 | mobile safari 11.0 | 2208x1242"
+    ],
+    "exposure_usd": 1906.07,
+    "evidence": [
+      {
+        "claim": "A shared device profile connects transactions from multiple customers in the bounded investigation window.",
+        "source": "graph",
+        "ref": "detector:shared_entity",
+        "entity_ids": [
+          "3471684",
+          "3472754",
+          "3473417",
+          "3473438",
+          "3474255",
+          "3476006",
+          "3476602",
+          "3476682",
+          "3478324",
+          "3480811",
+          "3481688",
+          "3481766"
+        ]
+      },
+      {
+        "claim": "Multiple online transactions occurred in the 48-hour investigation window.",
+        "source": "graph",
+        "ref": "detector:cnp",
+        "entity_ids": [
+          "3476602",
+          "3476633",
+          "3476665",
+          "3476682"
+        ]
+      },
+      {
+        "claim": "The flagged online transaction was recorded from a device marked New for the account.",
+        "source": "graph",
+        "ref": "detector:cnp_new_device",
+        "entity_ids": [
+          "3476682"
+        ]
+      },
+      {
+        "claim": "Mixed-channel activity coincides with a new device signal, warranting account-takeover review.",
+        "source": "graph",
+        "ref": "detector:account_takeover",
+        "entity_ids": [
+          "3473012",
+          "3474057",
+          "3476602",
+          "3476633",
+          "3476665",
+          "3476682",
+          "3477578",
+          "3478191"
+        ]
+      },
+      {
+        "claim": "Four online purchases below $500 occurred within forty minutes, indicating possible structuring.",
+        "source": "graph",
+        "ref": "detector:undocumented",
+        "entity_ids": [
+          "3476602",
+          "3476633",
+          "3476665",
+          "3476682"
+        ]
+      }
+    ],
+    "similar_prior_cases": [],
+    "summary": "Local detectors found pattern undocumented for flagged transaction 3476682. Evidence includes 4 affected transaction(s) and 10 connected card(s).",
+    "written_to_graph": false,
+    "graph_case_id": ""
+  },
+  "evidence_requests": [
+    {
+      "type": "customer_validation",
+      "asked_after_step": 4,
+      "assumed_response": "Customer denies making the transaction and reports it as unauthorized."
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R6: coordinated fraud shares a device"
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "R6: shared device connects multiple cards"
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: monitor cards sharing the device"
+      },
+      {
+        "action": "ESCALATE_TO_ANALYST",
+        "route": "auto",
+        "reason": "R9: undocumented coordinated activity requires analyst review"
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer denied the transaction"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer denial requires a fraud case"
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "R2: denial exceeds the report threshold or connects to shared activity"
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: monitor cards sharing the device"
+      },
+      {
+        "action": "ESCALATE_TO_ANALYST",
+        "route": "auto",
+        "reason": "R9: undocumented coordinated activity requires analyst review"
+      }
+    ],
+    "what_changed": "The simulated evidence response changed the policy branch and final recommendation."
+  },
+  "sar": {
+    "file": true,
+    "reason": "R9: coordinated undocumented activity requires a report",
+    "narrative": "Local detectors found pattern undocumented for flagged transaction 3476682. Evidence includes 4 affected transaction(s) and 10 connected card(s).",
+    "subjects": [
+      "C07297",
+      "C07297-K1",
+      "C01982-K2",
+      "C02859-K1",
+      "C04108-K2",
+      "C05244-K1",
+      "C07171-K2",
+      "C10448-K1",
+      "C11193-K1",
+      "C11385-K1",
+      "C11865-K1",
+      "C13086-K2"
+    ],
+    "total_amount_usd": 1906.07,
+    "activity_dates": [
+      "2016-11-21",
+      "2016-11-21"
+    ]
+  },
+  "stop_reason": "Customer response 'denied' settled the question.",
+  "tool_calls": 7,
+  "tokens": 0,
+  "latency_s": 0.0
+}
