@@ -1,0 +1,6 @@
+{
+  "name": "TigerGraph Fraud Investigation Agent",
+  "description": "Decision-support workspace for card fraud investigations, GSQL graph traversals, deterministic policy enforcement (R1-R10), and SAR reporting.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
