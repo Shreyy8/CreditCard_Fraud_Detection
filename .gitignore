@@ -11,10 +11,12 @@ venv/
 .env
 !.env.example
 
-# Generated calibration/model outputs
-models/
+# Generated calibration/model outputs (repo-root only; do not ignore backend/app/models)
+/models/
 
 # Local logs and editor files
 *.log
 .vscode/
 .idea/
+# Added by code-review-graph
+.code-review-graph/

@@ -1324,6 +1324,8 @@ class FraudAgent:
                 LifecycleState.awaiting_external_evidence
                 if state.stop_reason == "AWAITING_EXTERNAL_EVIDENCE"
                 else LifecycleState.escalated if state.status == CaseStatus.escalated
+                else LifecycleState.awaiting_approval
+                if any(a.route.value in {"L1", "L2"} for a in state.final_actions)
                 else LifecycleState.closed if state.status in {
                     CaseStatus.closed_fraud, CaseStatus.closed_legitimate
                 } else LifecycleState.ready_for_action

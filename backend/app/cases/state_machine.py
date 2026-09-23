@@ -30,15 +30,25 @@ ALLOWED_TRANSITIONS: dict[LifecycleState, set[LifecycleState]] = {
     LifecycleState.awaiting_approval: {
         LifecycleState.action_executing,
         LifecycleState.escalated,
+        LifecycleState.closed,
+        LifecycleState.awaiting_external_evidence,
     },
     LifecycleState.action_executing: {
         LifecycleState.action_executed,
         LifecycleState.action_failed,
     },
-    LifecycleState.action_executed: {LifecycleState.closed},
+    LifecycleState.action_executed: {
+        LifecycleState.closed,
+        LifecycleState.awaiting_approval,
+        LifecycleState.action_executing,
+    },
     LifecycleState.action_failed: {LifecycleState.escalated},
-    LifecycleState.escalated: {LifecycleState.investigating, LifecycleState.closed},
-    LifecycleState.closed: set(),
+    LifecycleState.escalated: {
+        LifecycleState.investigating,
+        LifecycleState.closed,
+        LifecycleState.awaiting_approval,
+    },
+    LifecycleState.closed: {LifecycleState.awaiting_approval},
     LifecycleState.failed: set(),
 }
 
