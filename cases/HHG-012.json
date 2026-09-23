@@ -1,9 +1,11 @@
 {
   "case_id": "HHG-012",
+  "schema_version": "1.0",
+  "policy_version": "1.0",
   "case": {
     "status": "open",
     "verdict": "uncertain",
-    "fraud_probability": 0.55,
+    "fraud_probability": 1.0,
     "pattern": "out_of_region_use",
     "pattern_description": "",
     "affected_txn_ids": [
@@ -65,7 +67,8 @@
     ],
     "summary": "Local detectors found pattern out_of_region_use for flagged transaction 3553342. Evidence includes 19 affected transaction(s) and 0 connected card(s).",
     "written_to_graph": false,
-    "graph_case_id": ""
+    "graph_case_id": "",
+    "fraud_probability_raw": 0.55
   },
   "evidence_requests": [
     {

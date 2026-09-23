@@ -168,8 +168,18 @@ def compose_answer(profile: dict[str, Any], detector_result: dict[str, Any]) -> 
     sar_file = any(item.action.value == "FILE_REPORT" for item in final_result.actions)
     dates = sorted(transaction_by_id[item]["ts"][:10] for item in affected_ids if item in transaction_by_id)
     summary = f"Local detectors found pattern {pattern} for flagged transaction {flagged_id}. Evidence includes {len(affected_ids)} affected transaction(s) and {len(connected_cards)} connected card(s)."
+    narrative = (
+        f"Customer {profile['trigger']['customer_id']} and card {profile['trigger']['card_id']} are associated with flagged transaction {flagged_id}. "
+        f"The activity occurred during the investigation window beginning on {dates[0] if dates else profile['opened_at'][:10]}. "
+        f"The observed channel and transaction sequence were assessed as pattern {pattern}. "
+        f"The investigation identified {len(affected_ids)} affected transaction(s) with total exposure of ${exposure:.2f}. "
+        f"The evidence is suspicious because the activity is inconsistent with the available customer and transaction context. "
+        f"The recommended response is governed by the cited policy rules and remains subject to the displayed approval route."
+    )
     return {
         "case_id": profile["case_id"],
+        "schema_version": "1.0",
+        "policy_version": "1.0",
         "case": {
             "status": "closed_fraud" if verdict == "fraud" else "open",
             "verdict": verdict,
@@ -196,7 +206,7 @@ def compose_answer(profile: dict[str, Any], detector_result: dict[str, Any]) -> 
         "sar": {
             "file": sar_file,
             "reason": "R9: coordinated undocumented activity requires a report" if sar_file else "No policy rule requires a suspicious activity report at this stage.",
-            "narrative": summary if sar_file else "",
+            "narrative": narrative if sar_file else "",
             "subjects": [profile["trigger"]["customer_id"], profile["trigger"]["card_id"], *connected_cards] if sar_file else [],
             "total_amount_usd": exposure if sar_file else 0,
             "activity_dates": [dates[0], dates[-1]] if sar_file and dates else [],
