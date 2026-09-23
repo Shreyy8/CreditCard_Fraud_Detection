@@ -5,7 +5,9 @@ This is the complete implementation checklist for the benchmark-ready system. Ta
 ## Phase 0: Project governance and setup
 
 - [x] Read and reconcile the dataset README, project README, PRD, and implementation plan.
-- [ ] Decide TigerGraph target: Savanna or Community Edition.
+- [x] Decide TigerGraph target: TigerGraph Savanna.
+- [ ] Create the Savanna workspace and record graph endpoint/database details in local environment configuration.
+- [ ] Enable Savanna auto-stop and auto-start to control workspace usage.
 - [ ] Create `.env.example` with graph, MCP, LLM, embedding, and feature flags.
 - [ ] Add `.gitignore` rules for raw external datasets, secrets, model files, and generated credentials.
 - [ ] Add pinned Python dependency file and installation instructions.
@@ -129,7 +131,7 @@ This is the complete implementation checklist for the benchmark-ready system. Ta
 
 ## Phase 8: TigerGraph schema and data loading
 
-- [ ] Create graph schema for Customer, Card, Transaction, DeviceProfile, EmailDomain, BillingRegion, ClosedCase, Case, Evidence, and Document.
+- [ ] Create graph schema for Customer, Card, Transaction, DeviceProfile, EmailDomain, BillingRegion, ClosedCase, Case, Evidence, and Document in Savanna.
 - [ ] Define primary IDs and attribute types.
 - [ ] Define `OWNS`, `MADE`, `FROM_DEVICE`, `PURCHASER_EMAIL`, `BILLED_IN`, `NEXT`, `INVOLVES`, `ON_CARD`, `CONNECTED_TO`, and case-memory edges.
 - [ ] Define temporal edge/vertex attributes.
@@ -175,7 +177,7 @@ This is the complete implementation checklist for the benchmark-ready system. Ta
 - [ ] Prepare policy and dataset pattern documents for retrieval.
 - [ ] Prepare closed-case notes for retrieval.
 - [ ] Prepare permitted regulatory and typology documents.
-- [ ] Create vector embeddings/indexes.
+- [ ] Create Savanna vector embeddings/indexes.
 - [ ] Implement hybrid graph-plus-vector retrieval.
 - [ ] Add retrieval citations and document section references.
 - [ ] Bound retrieved context by token/record limits.

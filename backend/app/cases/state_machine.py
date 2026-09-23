@@ -54,5 +54,7 @@ ALLOWED_TRANSITIONS: dict[LifecycleState, set[LifecycleState]] = {
 
 
 def transition(current: LifecycleState, target: LifecycleState) -> None:
+    if current == target:
+        return
     if target not in ALLOWED_TRANSITIONS.get(current, set()):
         raise ValueError(f"Invalid case transition: {current.value} -> {target.value}")

@@ -300,7 +300,7 @@ Use only the supplied transformed dataset and explicitly documented external doc
 
 ## 15. Open Decisions
 
-- Which TigerGraph deployment target will be used for the final demo: Savanna or Community Edition?
+- TigerGraph deployment target: Savanna.
 - Which LLM and embedding model are available within the hackathon environment?
 - Which evidence-request response simulation policy will be used consistently across cases?
 - What probability calibration method will be accepted for the benchmark run?
