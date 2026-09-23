@@ -255,7 +255,6 @@ export default function App() {
         selectedCaseId={selectedCaseId}
         cases={cases}
         pendingApprovalsCount={pendingApprovalsCount}
-        isLoading={loading}
       />
 
       <div className="border-b border-[#E5E2D9] bg-stone-50">
@@ -321,7 +320,6 @@ export default function App() {
             onSelectCase={handleSelectCase}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-            isLoading={loading}
           />
         )}
 
