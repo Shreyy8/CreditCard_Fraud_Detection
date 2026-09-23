@@ -1,4 +1,4 @@
-import { getCaseById } from '../data/cases';
+import { ALL_BENCHMARK_CASES, getCaseById } from '../data/cases';
 import {
   ActionItem,
   ActionName,
@@ -297,5 +297,27 @@ export function mapCaseAnswer(raw: CaseAnswer): BenchmarkCase {
 }
 
 export function mergeLiveCases(live: CaseAnswer[]): BenchmarkCase[] {
-  return live.map(mapCaseAnswer);
+  const liveMap = new Map<string, BenchmarkCase>();
+  for (const item of live) {
+    const mapped = mapCaseAnswer(item);
+    liveMap.set(mapped.case_id.toUpperCase(), mapped);
+  }
+
+  const result: BenchmarkCase[] = [];
+  const processedKeys = new Set<string>();
+
+  for (const benchCase of ALL_BENCHMARK_CASES) {
+    const key = benchCase.case_id.toUpperCase();
+    processedKeys.add(key);
+    const liveCase = liveMap.get(key);
+    result.push(liveCase || benchCase);
+  }
+
+  for (const [key, liveCase] of liveMap.entries()) {
+    if (!processedKeys.has(key)) {
+      result.push(liveCase);
+    }
+  }
+
+  return result;
 }

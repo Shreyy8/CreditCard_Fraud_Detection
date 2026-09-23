@@ -20,13 +20,15 @@ interface CaseQueueViewProps {
   onSelectCase: (caseId: string) => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  isLoading?: boolean;
 }
 
 export const CaseQueueView: React.FC<CaseQueueViewProps> = ({
   cases,
   onSelectCase,
   searchQuery,
-  setSearchQuery
+  setSearchQuery,
+  isLoading = false,
 }) => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [triggerFilter, setTriggerFilter] = useState<string>('all');
@@ -277,7 +279,21 @@ export const CaseQueueView: React.FC<CaseQueueViewProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E5E2D9]">
-              {filteredCases.length === 0 ? (
+              {isLoading ? (
+                Array.from({ length: 10 }).map((_, idx) => (
+                  <tr key={`skel-${idx}`} className="animate-pulse">
+                    <td className="py-3 px-4"><div className="w-16 h-4 bg-stone-200 rounded" /></td>
+                    <td className="py-3 px-4"><div className="w-48 h-4 bg-stone-200 rounded" /></td>
+                    <td className="py-3 px-4"><div className="w-24 h-4 bg-stone-150 rounded" /></td>
+                    <td className="py-3 px-4"><div className="w-28 h-4 bg-stone-150 rounded" /></td>
+                    <td className="py-3 px-4"><div className="w-20 h-4 bg-stone-200 rounded" /></td>
+                    <td className="py-3 px-4 text-right"><div className="w-16 h-4 bg-stone-200 rounded ml-auto" /></td>
+                    <td className="py-3 px-4"><div className="w-32 h-4 bg-stone-150 rounded" /></td>
+                    <td className="py-3 px-4 text-center"><div className="w-12 h-4 bg-stone-200 rounded mx-auto" /></td>
+                    <td className="py-3 px-4 text-right"><div className="w-16 h-4 bg-stone-200 rounded ml-auto" /></td>
+                  </tr>
+                ))
+              ) : filteredCases.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="py-12 text-center text-slate-500 font-sans">
                     No benchmark cases matching your search criteria.

@@ -26,6 +26,7 @@ interface HeaderProps {
   selectedCaseId: string | null;
   cases: BenchmarkCase[];
   pendingApprovalsCount: number;
+  isLoading?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -33,7 +34,8 @@ export const Header: React.FC<HeaderProps> = ({
   setActiveTab,
   selectedCaseId,
   cases,
-  pendingApprovalsCount
+  pendingApprovalsCount,
+  isLoading = false,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
@@ -56,7 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
       id: 'queue' as ActiveTab,
       label: 'Case Queue',
       icon: <Layers className="w-4 h-4" />,
-      badge: String(cases.length)
+      badge: isLoading ? '…' : String(cases.length)
     },
     {
       id: 'detail' as ActiveTab,
