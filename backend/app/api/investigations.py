@@ -22,10 +22,22 @@ router = APIRouter(prefix="/investigations", tags=["investigations"])
 _mgr = CaseManager()
 
 
+def _result_summary(answer: CaseAnswer, *, cached: bool) -> dict:
+    """Return the batch response shape without serialising the full answer."""
+    return {
+        "status": answer.case.status.value,
+        "verdict": answer.case.verdict.value,
+        "fraud_probability": answer.case.fraud_probability,
+        "latency_s": answer.latency_s,
+        "cached": cached,
+    }
+
+
 @router.post("/run")
 async def run_investigation(body: dict):
-    """Investigate a single case by case_id or inline case_pack row."""
+    """Investigate one case, reusing its persisted answer unless forced."""
     case_id = body.get("case_id")
+    force = bool(body.get("force", False))
     dl = get_data_layer()
 
     if case_id:
@@ -34,6 +46,14 @@ async def run_investigation(body: dict):
             raise HTTPException(404, f"Case {case_id} not in case_pack")
     else:
         row = body  # Allow inline case data
+        case_id = row.get("case_id")
+
+    if case_id and not force:
+        cached = _mgr.get_answer(case_id)
+        if cached:
+            logger.info("Returning cached investigation for %s", case_id)
+            _mgr.write_answer_file(cached)
+            return cached
 
     agent = FraudAgent()
     answer = await agent.investigate(row)
@@ -43,25 +63,29 @@ async def run_investigation(body: dict):
 
 
 @router.post("/run-all")
-async def run_all_investigations():
-    """Investigate all 20 cases. Non-blocking — returns status."""
+async def run_all_investigations(body: dict | None = None):
+    """Investigate the case pack, reusing persisted answers unless forced."""
+    force = bool((body or {}).get("force", False))
     dl = get_data_layer()
     cases = dl.get_all_case_pack_rows()
-    results = {"total": len(cases), "completed": 0, "failed": 0, "results": {}}
+    results = {"total": len(cases), "completed": 0, "cached": 0, "failed": 0, "results": {}}
 
     agent = FraudAgent()
     for row in cases:
         case_id = row.get("case_id", "")
         try:
+            if not force:
+                cached = _mgr.get_answer(case_id)
+                if cached:
+                    _mgr.write_answer_file(cached)
+                    results["results"][case_id] = _result_summary(cached, cached=True)
+                    results["cached"] += 1
+                    continue
+
             answer = await agent.investigate(row)
             _mgr.save_answer(answer)
             _mgr.log_audit(answer.case_id, answer.audit)
-            results["results"][case_id] = {
-                "status": answer.case.status.value,
-                "verdict": answer.case.verdict.value,
-                "fraud_probability": answer.case.fraud_probability,
-                "latency_s": answer.latency_s,
-            }
+            results["results"][case_id] = _result_summary(answer, cached=False)
             results["completed"] += 1
         except Exception as exc:  # noqa: BLE001
             logger.exception("Failed to investigate %s: %s", case_id, exc)
