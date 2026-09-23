@@ -68,9 +68,21 @@ class TGQueries:
     async def find_related_transactions(
         self, txn_id: str, hours_window: int = 48
     ) -> list[dict[str, Any]]:
-        """find_card_transactions — get recent txns for the card owning txn_id"""
+        """Find transactions sharing the flagged transaction's card."""
+        context = await self.tg.async_run_query(
+            "get_transaction_context", {"txn": txn_id}
+        )
+        card_ids = []
+        for block in context:
+            card_ids.extend(
+                str(item.get("v_id", ""))
+                for item in block.get("Cards", [])
+                if item.get("v_id")
+            )
+        if not card_ids:
+            return []
         results = await self.tg.async_run_query(
-            "find_card_transactions", {"card": txn_id, "lim": 50}
+            "find_card_transactions", {"card": card_ids[0], "lim": 50}
         )
         return results[0].get("Txns", []) if results else []
 
@@ -202,10 +214,28 @@ class TGQueries:
         return {"community_size": len(ids), "members": ids}
 
     async def run_centrality(self, txn_id: str) -> dict[str, Any]:
-        results = await self.tg.async_run_query(
-            "find_behavioral_anomalies", {"card": txn_id}
+        context = await self.tg.async_run_query(
+            "get_transaction_context", {"txn": txn_id}
         )
+        card_id = ""
+        for block in context:
+            cards = block.get("Cards", [])
+            if cards:
+                card_id = str(cards[0].get("v_id", ""))
+                break
+        if not card_id:
+            return {}
+        results = await self.tg.async_run_query("find_card_network", {"card": card_id, "lim": 100})
         return results[0] if results else {}
 
     async def run_path_analysis(self, from_id: str, to_id: str) -> list[list[str]]:
-        return []
+        results = await self.tg.async_run_query(
+            "find_shared_identity", {"txn": from_id}
+        )
+        paths: list[list[str]] = []
+        for block in results:
+            for item in block.get("OtherTxns", []):
+                candidate = str(item.get("v_id", ""))
+                if candidate == str(to_id):
+                    paths.append([str(from_id), "shared_identity", candidate])
+        return paths

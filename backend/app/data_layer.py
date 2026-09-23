@@ -67,6 +67,7 @@ class DataLayer:
         self.region_transactions: dict[str, list[str]] = defaultdict(list)    # addr1 → [txn_ids]
         self.customer_cases: dict[str, list[str]] = defaultdict(list)         # customer_id → [case_ids]
         self.card_cases: dict[str, list[str]] = defaultdict(list)             # card_id → [case_ids]
+        self.transaction_cards: dict[str, dict[str, str]] = {}                # txn_id → derived mapping
 
     @classmethod
     def get(cls) -> "DataLayer":
@@ -85,6 +86,7 @@ class DataLayer:
         logger.info("Loading CSV data into memory...")
         self._load_case_pack()
         self._load_closed_cases()
+        self._load_transaction_cards()
         self._load_transactions()
         self._load_identity()
         self._loaded = True
@@ -126,8 +128,11 @@ class DataLayer:
             reader = csv.DictReader(f)
             for row in reader:
                 tid = row["TransactionID"]
+                mapping = self.transaction_cards.get(tid, {})
+                card_id = mapping.get("card_id", "")
+                if card_id:
+                    row["card_id"] = card_id
                 self.transactions[tid] = row
-                card_id = self._derive_card_id(row)
                 customer_id = row.get("customer_id", "")
                 if card_id:
                     self.card_transactions[card_id].append(tid)
@@ -145,6 +150,23 @@ class DataLayer:
                 if r:
                     self.region_transactions[r].append(tid)
 
+    def _load_transaction_cards(self) -> None:
+        """Load the derived card mapping without treating unresolved rows as cards."""
+        path = _resolve_path(settings.transaction_cards_csv)
+        if not os.path.exists(path):
+            logger.warning("Transaction card mapping not found: %s", path)
+            return
+        with open(path, newline="", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                transaction_id = row.get("TransactionID", "")
+                card_id = row.get("card_id", "").strip()
+                if transaction_id:
+                    self.transaction_cards[transaction_id] = {
+                        "customer_id": row.get("customer_id", "").strip(),
+                        "card_id": card_id,
+                        "mapping_source": row.get("mapping_source", "").strip(),
+                    }
+
     def _load_identity(self) -> None:
         path = _resolve_path(settings.identity_csv)
         if not os.path.exists(path):
@@ -158,15 +180,6 @@ class DataLayer:
                 device_key = self._device_key(row)
                 if device_key:
                     self.device_transactions[device_key].append(tid)
-
-    @staticmethod
-    def _derive_card_id(row: dict) -> str:
-        """Derive card_id from customer_id + card1 heuristic, or return customer_id-K1."""
-        customer_id = row.get("customer_id", "")
-        # The dataset uses customer_id directly for card_id derivation
-        # Cards look like C01234-K1; for this layer, use customer_id as prefix
-        # The actual card_id comes from the case_pack / closed_cases
-        return customer_id  # fallback; real card_id is in case_pack
 
     @staticmethod
     def _device_key(identity_row: dict) -> str:
@@ -189,8 +202,7 @@ class DataLayer:
 
     def get_card_transactions(self, card_id: str, limit: int = 200) -> list[dict]:
         """Get transactions for a card_id. card_id format: C01234-K1."""
-        customer_prefix = card_id.split("-")[0] if "-" in card_id else card_id
-        txn_ids = self.customer_transactions.get(customer_prefix, [])
+        txn_ids = self.card_transactions.get(card_id, [])
         txns = [self.transactions[tid] for tid in txn_ids[-limit:] if tid in self.transactions]
         return sorted(txns, key=lambda r: r.get("ts", ""))
 

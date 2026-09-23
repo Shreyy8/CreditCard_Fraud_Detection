@@ -194,3 +194,97 @@ CREATE OR REPLACE QUERY link_fraud_case(
 
   PRINT FC, T, C, CU;
 }
+
+// ── Pattern and network queries ─────────────────────────────────────────────
+// These queries return bounded evidence summaries. The application remains the
+// authority for final pattern labels and policy decisions.
+
+CREATE OR REPLACE QUERY detect_card_testing(VERTEX<Card> card, INT lim = 100)
+FOR GRAPH FraudCaseGraph {
+  Seed = {card};
+  Txns = SELECT t FROM Seed:c -(transaction_belongs_to_card)- Transaction:t
+         ORDER BY t.ts DESC LIMIT lim;
+  SetAccum<STRING> @@products;
+  SumAccum<INT> @@count;
+  SumAccum<DOUBLE> @@amount;
+  Txns = SELECT t FROM Txns:t
+         ACCUM @@count += 1, @@amount += t.transaction_amt,
+               @@products += t.product_cd;
+  PRINT @@count AS txn_count, @@amount AS total_amount,
+        @@products AS product_codes, Txns;
+}
+
+CREATE OR REPLACE QUERY detect_cnp_burst(VERTEX<Card> card, INT lim = 100)
+FOR GRAPH FraudCaseGraph {
+  Seed = {card};
+  Txns = SELECT t FROM Seed:c -(transaction_belongs_to_card)- Transaction:t
+         WHERE t.channel == "online"
+         ORDER BY t.ts DESC LIMIT lim;
+  SetAccum<STRING> @@txn_ids;
+  SumAccum<DOUBLE> @@amount;
+  Txns = SELECT t FROM Txns:t
+         ACCUM @@txn_ids += getvid(t), @@amount += t.transaction_amt;
+  PRINT @@txn_ids AS online_txn_ids, @@amount AS online_amount, Txns;
+}
+
+CREATE OR REPLACE QUERY detect_new_device(VERTEX<Card> card, INT lim = 100)
+FOR GRAPH FraudCaseGraph {
+  Seed = {card};
+  Txns = SELECT t FROM Seed:c -(transaction_belongs_to_card)- Transaction:t
+         ORDER BY t.ts DESC LIMIT lim;
+  Identities = SELECT i FROM Txns:t -(transaction_has_identity)- Identity:i
+               WHERE i.id_15 == "New";
+  PRINT Txns, Identities;
+}
+
+CREATE OR REPLACE QUERY detect_out_of_region(VERTEX<Card> card, STRING home_region, INT lim = 100)
+FOR GRAPH FraudCaseGraph {
+  Seed = {card};
+  Txns = SELECT t FROM Seed:c -(transaction_belongs_to_card)- Transaction:t
+         WHERE t.addr1 != home_region ORDER BY t.ts DESC LIMIT lim;
+  PRINT Txns;
+}
+
+CREATE OR REPLACE QUERY detect_account_takeover(VERTEX<Customer> customer, INT lim = 100)
+FOR GRAPH FraudCaseGraph {
+  Seed = {customer};
+  Txns = SELECT t FROM Seed:c -(transaction_belongs_to_customer)- Transaction:t
+         ORDER BY t.ts DESC LIMIT lim;
+  Identities = SELECT i FROM Txns:t -(transaction_has_identity)- Identity:i;
+  Devices = SELECT d FROM Identities:i -(FROM_DEVICE)- DeviceProfile:d;
+  PRINT Txns, Identities, Devices;
+}
+
+CREATE OR REPLACE QUERY find_device_ring(VERTEX<Transaction> txn, INT lim = 100)
+FOR GRAPH FraudCaseGraph {
+  Seed = {txn};
+  Devices = SELECT d FROM Seed:t -(FROM_DEVICE)- DeviceProfile:d;
+  SharedTxns = SELECT t2 FROM Devices:d <-(FROM_DEVICE)- Transaction:t2
+               WHERE t2 != txn LIMIT lim;
+  Customers = SELECT c FROM SharedTxns:t -(transaction_belongs_to_customer)- Customer:c;
+  Cards = SELECT c FROM SharedTxns:t -(transaction_belongs_to_card)- Card:c;
+  PRINT Devices, SharedTxns, Customers, Cards;
+}
+
+CREATE OR REPLACE QUERY find_temporal_prior_cases(
+    VERTEX<Customer> customer, VERTEX<Card> card, DATETIME before_time, INT lim = 50
+) FOR GRAPH FraudCaseGraph {
+  CustCases = SELECT fc FROM {customer}:c -(closed_case_involves_customer)- FraudCase:fc
+              WHERE fc.opened_at < before_time ORDER BY fc.opened_at DESC LIMIT lim;
+  CardCases = SELECT fc FROM {card}:c -(closed_case_involves_card)- FraudCase:fc
+              WHERE fc.opened_at < before_time ORDER BY fc.opened_at DESC LIMIT lim;
+  Cases = CustCases UNION CardCases;
+  PRINT Cases;
+}
+
+CREATE OR REPLACE QUERY find_card_network(VERTEX<Card> card, INT lim = 100)
+FOR GRAPH FraudCaseGraph {
+  Seed = {card};
+  Neighbors = SELECT c2 FROM Seed:c -(CONNECTED_TO)- Card:c2 LIMIT lim;
+  ViaCustomer = SELECT c2 FROM Seed:c -(transaction_belongs_to_card:e)- Transaction:t
+                -(transaction_belongs_to_customer)- Customer:cu
+                -(transaction_belongs_to_customer:e2)- Transaction:t2
+                -(transaction_belongs_to_card)- Card:c2
+                WHERE c2 != card LIMIT lim;
+  PRINT Neighbors, ViaCustomer;
+}

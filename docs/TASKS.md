@@ -8,12 +8,12 @@ This is the complete implementation checklist for the benchmark-ready system. Ta
 - [x] Decide TigerGraph target: TigerGraph Savanna.
 - [ ] Create the Savanna workspace and record graph endpoint/database details in local environment configuration.
 - [ ] Enable Savanna auto-stop and auto-start to control workspace usage.
-- [ ] Create `.env.example` with graph, MCP, LLM, embedding, and feature flags.
-- [ ] Add `.gitignore` rules for raw external datasets, secrets, model files, and generated credentials.
+- [x] Create `.env.example` with graph, MCP, LLM, embedding, and feature flags.
+- [x] Add `.gitignore` rules for raw external datasets, secrets, model files, and generated credentials.
 - [ ] Add pinned Python dependency file and installation instructions.
-- [ ] Add a single documented clean-start command sequence.
+- [x] Add a single documented clean-start command sequence.
 - [ ] Define repository conventions for source, artifacts, cases, graph files, documents, and UI.
-- [ ] Document the prohibition on public IEEE-CIS/Kaggle outcome recovery.
+- [x] Document the prohibition on public IEEE-CIS/Kaggle outcome recovery.
 
 ## Phase 1: Dataset contract and local artifacts
 
@@ -79,7 +79,7 @@ This is the complete implementation checklist for the benchmark-ready system. Ta
 - [ ] Add policy result serialization.
 - [ ] Add policy version to every answer and graph case.
 - [ ] Add action deduplication and stable ordering.
-- [ ] Add explicit action execution adapter that rejects L1/L2 execution.
+- [x] Add explicit action execution adapter that rejects L1/L2 execution.
 - [ ] Add tests for action conflicts across multiple detector matches.
 - [ ] Add tests for recurring-charge R7 precedence.
 
@@ -89,8 +89,8 @@ This is the complete implementation checklist for the benchmark-ready system. Ta
 - [x] Implement no-reply branch.
 - [x] Persist initial and final actions.
 - [x] Persist `what_changed`.
-- [ ] Add explicit state machine states: trigger, open, gather, detect, assess, request, reassess, recommend, approve, close.
-- [ ] Add checkpoint/resume support.
+- [x] Add explicit state machine states: trigger, open, gather, detect, assess, request, reassess, recommend, approve, close.
+- [x] Add checkpoint/resume support.
 - [ ] Add request policy deciding when more evidence can change the decision.
 - [ ] Add step-up authentication simulation.
 - [ ] Add analyst-information simulation.
@@ -132,10 +132,10 @@ This is the complete implementation checklist for the benchmark-ready system. Ta
 ## Phase 8: TigerGraph schema and data loading
 
 - [ ] Create graph schema for Customer, Card, Transaction, DeviceProfile, EmailDomain, BillingRegion, ClosedCase, Case, Evidence, and Document in Savanna.
-- [ ] Define primary IDs and attribute types.
-- [ ] Define `OWNS`, `MADE`, `FROM_DEVICE`, `PURCHASER_EMAIL`, `BILLED_IN`, `NEXT`, `INVOLVES`, `ON_CARD`, `CONNECTED_TO`, and case-memory edges.
-- [ ] Define temporal edge/vertex attributes.
-- [ ] Create CSV preparation jobs from local artifacts.
+- [x] Define primary IDs and attribute types.
+- [x] Define `OWNS`, `MADE`, `FROM_DEVICE`, `PURCHASER_EMAIL`, `BILLED_IN`, `NEXT`, `INVOLVES`, `ON_CARD`, `CONNECTED_TO`, and case-memory edges.
+- [x] Define temporal edge/vertex attributes.
+- [x] Create CSV preparation jobs from local artifacts.
 - [ ] Create GSQL loading jobs.
 - [ ] Load core Customer/Card/Transaction graph.
 - [ ] Load identity/device entities.
@@ -148,22 +148,22 @@ This is the complete implementation checklist for the benchmark-ready system. Ta
 
 ## Phase 9: GSQL queries and graph algorithms
 
-- [ ] Query customer transaction history.
-- [ ] Query card transaction windows.
-- [ ] Query online identity/device history.
-- [ ] Query billing-region history.
-- [ ] Query device neighbors across customers/cards.
-- [ ] Query region and email neighbors.
-- [ ] Query temporally valid prior cases.
-- [ ] Implement card-testing traversal/query.
-- [ ] Implement CNP burst query.
-- [ ] Implement new-device query.
-- [ ] Implement out-of-region query.
-- [ ] Implement account-takeover query.
-- [ ] Implement shared-entity ring query.
-- [ ] Implement undocumented coordination discovery query.
+- [x] Query customer transaction history.
+- [x] Query card transaction windows.
+- [x] Query online identity/device history.
+- [x] Query billing-region history.
+- [x] Query device neighbors across customers/cards.
+- [x] Query region and email neighbors.
+- [x] Query temporally valid prior cases.
+- [x] Implement card-testing traversal/query.
+- [x] Implement CNP burst query.
+- [x] Implement new-device query.
+- [x] Implement out-of-region query.
+- [x] Implement account-takeover query.
+- [x] Implement shared-entity ring query.
+- [x] Implement undocumented coordination discovery query.
 - [ ] Add graph algorithm for connected-component/ring analysis.
-- [ ] Return bounded structured evidence briefs from every query.
+- [x] Return bounded structured evidence briefs from every query.
 - [ ] Add query fixtures and compare query output with local detectors.
 
 ## Phase 10: TigerGraph MCP and GraphRAG
@@ -185,8 +185,8 @@ This is the complete implementation checklist for the benchmark-ready system. Ta
 
 ## Phase 11: Agent orchestration and LLM integration
 
-- [ ] Choose LangGraph or equivalent orchestration framework.
-- [ ] Define typed investigation state.
+- [x] Choose LangGraph or equivalent orchestration framework.
+- [x] Define typed investigation state.
 - [ ] Implement trigger and case-opening nodes.
 - [ ] Implement graph evidence gathering node.
 - [ ] Implement deterministic detector node.
@@ -199,28 +199,28 @@ This is the complete implementation checklist for the benchmark-ready system. Ta
 - [ ] Add LLM structured-output schema.
 - [ ] Restrict LLM context to graph/retrieval briefs.
 - [ ] Reject invalid LLM IDs/actions and retry or fall back.
-- [ ] Keep policy actions deterministic after LLM output.
+- [x] Keep policy actions deterministic after LLM output.
 - [ ] Add prompt/model/version metadata.
 - [ ] Add graceful fallback when LLM, MCP, or optional Jev is unavailable.
 - [ ] Keep Jev disabled by default and optional.
 
 ## Phase 12: Analyst UI
 
-- [ ] Choose UI framework and application structure.
-- [ ] Add case list and case selection.
-- [ ] Add case header and trigger panel.
-- [ ] Add transaction timeline.
-- [ ] Add evidence claims with citations.
-- [ ] Add graph relationship visualization.
-- [ ] Add pattern detector panel.
-- [ ] Add probability/exposure/uncertainty panel.
-- [ ] Add initial/final action comparison.
-- [ ] Add approval route and execution state.
-- [ ] Add evidence-request history.
-- [ ] Add SAR decision and narrative view.
-- [ ] Add validation/data-quality warning view.
-- [ ] Add answer JSON download.
-- [ ] Add loading, empty, error, and degraded-mode states.
+- [x] Choose UI framework and application structure.
+- [x] Add case list and case selection.
+- [x] Add case header and trigger panel.
+- [x] Add transaction timeline.
+- [x] Add evidence claims with citations.
+- [x] Add graph relationship visualization.
+- [x] Add pattern detector panel.
+- [x] Add probability/exposure/uncertainty panel.
+- [x] Add initial/final action comparison.
+- [x] Add approval route and execution state.
+- [x] Add evidence-request history.
+- [x] Add SAR decision and narrative view.
+- [x] Add validation/data-quality warning view.
+- [x] Add answer JSON download.
+- [x] Add loading, empty, error, and degraded-mode states.
 - [ ] Verify desktop and mobile layout for the demo.
 
 ## Phase 13: Testing and quality
@@ -228,7 +228,7 @@ This is the complete implementation checklist for the benchmark-ready system. Ta
 - [x] Run detector tests.
 - [x] Run investigation and validator tests.
 - [x] Run Python compilation checks.
-- [ ] Install and run the complete policy test suite.
+- [x] Install and run the complete policy test suite.
 - [ ] Add dataset verification tests.
 - [ ] Add graph load integration tests.
 - [ ] Add MCP tool contract tests.
@@ -245,11 +245,11 @@ This is the complete implementation checklist for the benchmark-ready system. Ta
 
 - [ ] Update README setup instructions.
 - [ ] Document local-only reference pipeline.
-- [ ] Document TigerGraph setup and shutdown.
-- [ ] Document graph schema and GSQL queries.
+- [x] Document TigerGraph setup and shutdown.
+- [x] Document graph schema and GSQL queries.
 - [ ] Document MCP configuration.
 - [ ] Document GraphRAG sources and citations.
-- [ ] Document policy engine and approval boundaries.
+- [x] Document policy engine and approval boundaries.
 - [ ] Document answer schema and validator.
 - [ ] Document calibration methodology.
 - [ ] Generate final 20 answer files.
