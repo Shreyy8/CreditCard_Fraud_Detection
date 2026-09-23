@@ -227,11 +227,17 @@ class MCPInvestigationClient:
     """
 
     GRAPH_NAME = property(lambda self: get_settings().tigergraph_graph_name)
+    REQUIRED_TOOLS = (
+        "tigergraph__run_installed_query",
+        "tigergraph__get_graph_schema",
+        "tigergraph__list_graphs",
+    )
 
     def __init__(self) -> None:
         # Initialise state immediately so the object is always safe to call
         self._session: _MCPSession | None = None
         self._available: bool = False
+        self._startup_error: str = ""
 
     # ── Session lifecycle ─────────────────────────────────────────────────────
 
@@ -245,6 +251,7 @@ class MCPInvestigationClient:
                 len(self._session.tools),
             )
         except Exception as exc:  # noqa: BLE001
+            self._startup_error = str(exc)
             logger.warning("MCP unavailable: %s", exc)
             self._session = None
             self._available = False
@@ -266,6 +273,20 @@ class MCPInvestigationClient:
     @property
     def tool_names(self) -> list[str]:
         return self._session.tool_names if self._session else []
+
+    async def health_check(self) -> dict[str, Any]:
+        """Return an actionable MCP readiness report without making a query."""
+        names = self.tool_names
+        missing = [name for name in self.REQUIRED_TOOLS if name not in names]
+        return {
+            "available": self.available,
+            "tool_count": len(names),
+            "tools": names,
+            "required_tools": list(self.REQUIRED_TOOLS),
+            "missing_required_tools": missing,
+            "error": self._startup_error,
+            "ready": self.available and not missing,
+        }
 
     # ── Internal call wrapper ─────────────────────────────────────────────────
 

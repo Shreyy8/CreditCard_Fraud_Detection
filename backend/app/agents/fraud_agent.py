@@ -975,33 +975,33 @@ class FraudAgent:
           R2 — customer denial settles the question; no further evidence needed
           R8 — escalate when uncertain AND exposure > $500
 
-        Gates:
-          - Never request evidence if fp >= 0.80 (strong fraud) or fp <= 0.20 (strong clear).
-          - For customer_report triggers, request confirmation only when fp is
-            genuinely ambiguous (0.25–0.75); a denial + fp > 0.75 is already decisive.
+                Gates:
+                    - An unvalidated customer_report always requests customer confirmation,
+                        because the report itself is the evidence request trigger.
+                    - Never repeat a customer-validation request after a response is received.
+                    - For other triggers, do not request evidence if fp >= 0.80 (strong fraud)
+                        or fp <= 0.20 (strong clear).
           - For risk-score triggers, request step-up only when fp < 0.70 AND weak signals.
         """
         fp = state.fraud_probability
         uncertainty = risk.uncertainty_flags
 
-        # Already decided — no evidence request needed
-        if fp >= 0.80 or fp <= 0.20:
-            return False, None
-
-        # Customer report in the ambiguous zone: verify authorization
-        # (Policy R1 — do not block on a single signal below 0.70 without verification)
-        if (state.trigger_type == "customer_report"
-                and not state.evidence_received
-                and 0.25 <= fp <= 0.75):
+        # A customer report must be explicitly validated before the automated
+        # decision can treat the authorization question as settled.
+        if state.trigger_type == "customer_report" and not state.evidence_received:
             return True, EvidenceRequest(
                 type=EvidenceRequestType.customer_validation,
                 asked_after_step=state.step,
                 assumed_response="",
                 reason=(
-                    "Authorization is unresolved; a verified customer response "
-                    "resolves ambiguity and determines the permitted action (Policy R2/R3)."
+                    "Customer-reported activity requires authorization validation "
+                    "before the final action is determined (Policy R2/R3)."
                 ),
             )
+
+        # Already decided — no evidence request needed
+        if fp >= 0.80 or fp <= 0.20:
+            return False, None
 
         # R1: single weak signal + below-blocking threshold
         if fp < 0.70 and risk.evidence_count <= 1:
@@ -1366,8 +1366,16 @@ class FraudAgent:
     def _init_state(row: dict[str, Any]) -> InvestigationState:
         risk_score_str = row.get("risk_score", "")
         risk_score = float(risk_score_str) if risk_score_str else None
+        opened_at = row.get("opened_at")
+        started_at = datetime.utcnow()
+        if opened_at:
+            try:
+                started_at = datetime.fromisoformat(str(opened_at).replace("Z", "+00:00"))
+            except ValueError:
+                logger.warning("Invalid opened_at for %s: %s", row.get("case_id"), opened_at)
         return InvestigationState(
             case_id=row["case_id"],
+            started_at=started_at,
             trigger_type=row.get("trigger_type", ""),
             trigger_text=row.get("trigger_text", ""),
             flagged_txn_id=str(row.get("flagged_txn_id", "")),

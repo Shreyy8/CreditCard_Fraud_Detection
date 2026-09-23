@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from ..config import get_settings
-from ..models.case import CaseAnswer, CaseStatus, Verdict
+from ..models.case import CaseAnswer, CaseStatus, InvestigationState, Verdict
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -74,6 +74,12 @@ def _init_db() -> None:
                 response_json TEXT,
                 created_at TEXT NOT NULL,
                 received_at TEXT
+            );
+            CREATE TABLE IF NOT EXISTS investigation_checkpoints (
+                case_id TEXT PRIMARY KEY,
+                phase TEXT NOT NULL,
+                state_json TEXT NOT NULL,
+                updated_at TEXT NOT NULL
             );
         """)
 
@@ -179,6 +185,38 @@ class CaseManager:
 
     def update_answer(self, answer: CaseAnswer) -> None:
         self.save_answer(answer)
+
+    def save_checkpoint(self, state: InvestigationState, phase: str) -> None:
+        """Persist a resumable typed state after each orchestration phase."""
+        with _conn() as con:
+            con.execute(
+                "INSERT OR REPLACE INTO investigation_checkpoints "
+                "(case_id, phase, state_json, updated_at) VALUES (?, ?, ?, ?)",
+                (
+                    state.case_id,
+                    phase,
+                    state.model_dump_json(),
+                    datetime.now(timezone.utc).isoformat(),
+                ),
+            )
+
+    def get_checkpoint(self, case_id: str) -> tuple[str, InvestigationState] | None:
+        with _conn() as con:
+            row = con.execute(
+                "SELECT phase, state_json FROM investigation_checkpoints "
+                "WHERE case_id = ?",
+                (case_id,),
+            ).fetchone()
+        if not row:
+            return None
+        return row["phase"], InvestigationState.model_validate_json(row["state_json"])
+
+    def clear_checkpoint(self, case_id: str) -> None:
+        with _conn() as con:
+            con.execute(
+                "DELETE FROM investigation_checkpoints WHERE case_id = ?",
+                (case_id,),
+            )
 
     def create_evidence_request(self, case_id: str, request: dict[str, Any]) -> dict[str, Any]:
         request_id = request.get("request_id") or str(uuid4())

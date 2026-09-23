@@ -62,7 +62,8 @@ class Settings(BaseSettings):
     secret_key: str = "dev-secret-key"
 
     # ── Datasets ──────────────────────────────────────────────────────────────
-    transactions_csv: str = "artifacts/transaction_cards.csv"
+    transactions_csv: str = "DataSet/transactions.csv"
+    transaction_cards_csv: str = "artifacts/transaction_cards.csv"
     identity_csv: str = "DataSet/identity.csv"
     closed_cases_csv: str = "DataSet/closed_cases_history.csv"
     case_pack_csv: str = "DataSet/case_pack.csv"

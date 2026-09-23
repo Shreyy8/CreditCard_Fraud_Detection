@@ -78,3 +78,12 @@ Integrate the local investigation contract with TigerGraph schema/load jobs and 
 	- strong coordinated evidence stops without an unnecessary request.
 - Draft answers now preserve `initial`, `final`, `what_changed`, and `evidence_requests` consistently.
 - The regenerated 20-case batch contains 10 evidence-request transitions and passes validation with zero failures.
+
+## Completed graph-preparation prerequisite
+
+- The local data layer now loads `artifacts/transaction_cards.csv` as the source of transaction-to-card relationships.
+- Card history no longer falls back to all transactions for a customer, preventing cross-card evidence leakage.
+- Unresolved mapping rows remain excluded from card indexes rather than being treated as verified relationships.
+- Added a focused regression test covering two cards belonging to one customer.
+
+The next graph step remains schema/load implementation in TigerGraph. The local prerequisite is now ready for parity checks once `pyTigerGraph` and a configured Savanna workspace are available.

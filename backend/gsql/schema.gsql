@@ -1,0 +1,136 @@
+// FraudCaseGraph schema for TigerGraph Savanna 4.2.x.
+// Run this file once before loading data. The Python loader in graph_loader.py
+// performs the joins and upserts because the source CSVs are deliberately
+// denormalised and the card mapping is derived locally.
+
+CREATE VERTEX Customer (
+  PRIMARY_ID customer_id STRING,
+  customer_id STRING,
+  created_at DATETIME,
+  risk_segment STRING
+) WITH primary_id_as_attribute="true";
+
+CREATE VERTEX Card (
+  PRIMARY_ID card_id STRING,
+  card_id STRING,
+  customer_id STRING,
+  card1 STRING,
+  card2 STRING,
+  card3 STRING,
+  card4 STRING,
+  card5 STRING,
+  card6 STRING
+) WITH primary_id_as_attribute="true";
+
+CREATE VERTEX Transaction (
+  PRIMARY_ID transaction_id STRING,
+  transaction_id STRING,
+  transaction_amt DOUBLE,
+  transaction_dt INT,
+  product_cd STRING,
+  customer_id STRING,
+  card_id STRING,
+  channel STRING,
+  ts DATETIME,
+  risk_score DOUBLE,
+  addr1 STRING,
+  addr2 STRING,
+  p_emaildomain STRING,
+  r_emaildomain STRING
+) WITH primary_id_as_attribute="true";
+
+CREATE VERTEX Identity (
+  PRIMARY_ID identity_id STRING,
+  transaction_id STRING,
+  device_info STRING,
+  id_15 STRING,
+  id_23 STRING,
+  id_30 STRING,
+  id_31 STRING,
+  id_33 STRING,
+  device_key STRING
+) WITH primary_id_as_attribute="true";
+
+CREATE VERTEX DeviceProfile (
+  PRIMARY_ID device_key STRING,
+  device_key STRING,
+  device_info STRING,
+  operating_system STRING,
+  browser STRING,
+  screen STRING,
+  proxy_type STRING
+) WITH primary_id_as_attribute="true";
+
+CREATE VERTEX EmailDomain (
+  PRIMARY_ID email_domain STRING,
+  email_domain STRING
+) WITH primary_id_as_attribute="true";
+
+CREATE VERTEX BillingRegion (
+  PRIMARY_ID region_id STRING,
+  region_id STRING,
+  country_code STRING
+) WITH primary_id_as_attribute="true";
+
+CREATE VERTEX FraudCase (
+  PRIMARY_ID case_id STRING,
+  case_id STRING,
+  opened_at DATETIME,
+  closed_at DATETIME,
+  trigger_type STRING,
+  trigger_text STRING,
+  outcome STRING,
+  verdict STRING,
+  pattern STRING,
+  risk_score DOUBLE,
+  exposure_usd DOUBLE,
+  txn_ids STRING,
+  n_txns INT,
+  connected_card_ids STRING,
+  actions_taken STRING,
+  report_filed BOOL,
+  analyst_notes STRING
+) WITH primary_id_as_attribute="true";
+
+CREATE VERTEX Evidence (
+  PRIMARY_ID evidence_id STRING,
+  evidence_id STRING,
+  claim STRING,
+  source_type STRING,
+  source_ref STRING,
+  retrieved_at DATETIME
+) WITH primary_id_as_attribute="true";
+
+CREATE VERTEX Document (
+  PRIMARY_ID document_id STRING,
+  document_id STRING,
+  title STRING,
+  section STRING,
+  body STRING,
+  source_uri STRING
+) WITH primary_id_as_attribute="true";
+
+CREATE DIRECTED EDGE OWNS (FROM Customer, TO Card, since DATETIME);
+CREATE DIRECTED EDGE MADE (FROM Customer, TO Transaction, ts DATETIME);
+CREATE DIRECTED EDGE FROM_DEVICE (FROM Transaction, TO DeviceProfile, ts DATETIME, is_new BOOL);
+CREATE DIRECTED EDGE PURCHASER_EMAIL (FROM Transaction, TO EmailDomain, email_type STRING);
+CREATE DIRECTED EDGE BILLED_IN (FROM Transaction, TO BillingRegion, addr2 STRING);
+CREATE DIRECTED EDGE NEXT (FROM Transaction, TO Transaction, seconds INT);
+CREATE DIRECTED EDGE INVOLVES (FROM FraudCase, TO Transaction, role STRING);
+CREATE DIRECTED EDGE ON_CARD (FROM Transaction, TO Card, ts DATETIME);
+CREATE DIRECTED EDGE CONNECTED_TO (FROM Card, TO Card, reason STRING, observed_at DATETIME);
+CREATE DIRECTED EDGE HAS_EVIDENCE (FROM FraudCase, TO Evidence, source_type STRING);
+CREATE DIRECTED EDGE DESCRIBES (FROM Document, TO FraudCase, relevance DOUBLE);
+
+// Backward-compatible names used by the current query layer.
+CREATE DIRECTED EDGE case_flagged_transaction (FROM FraudCase, TO Transaction);
+CREATE DIRECTED EDGE case_involves_card (FROM FraudCase, TO Card);
+CREATE DIRECTED EDGE case_involves_customer (FROM FraudCase, TO Customer);
+CREATE DIRECTED EDGE closed_case_involves_customer (FROM FraudCase, TO Customer);
+CREATE DIRECTED EDGE closed_case_involves_card (FROM FraudCase, TO Card);
+CREATE DIRECTED EDGE closed_case_first_fraud_transaction (FROM FraudCase, TO Transaction);
+CREATE DIRECTED EDGE transaction_belongs_to_card (FROM Transaction, TO Card);
+CREATE DIRECTED EDGE transaction_belongs_to_customer (FROM Transaction, TO Customer);
+CREATE DIRECTED EDGE transaction_has_identity (FROM Transaction, TO Identity);
+
+CREATE GRAPH FraudCaseGraph (*);

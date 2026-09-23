@@ -16,6 +16,7 @@ venv/
 
 # Local logs and editor files
 *.log
+fraud_cases.db
 .vscode/
 .idea/
 # Added by code-review-graph

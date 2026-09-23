@@ -1,9 +1,11 @@
 {
   "case_id": "HHG-007",
+  "schema_version": "1.0",
+  "policy_version": "1.0",
   "case": {
     "status": "closed_fraud",
     "verdict": "fraud",
-    "fraud_probability": 0.9,
+    "fraud_probability": 1.0,
     "pattern": "undocumented",
     "pattern_description": "Coordinated activity across multiple customers sharing a device profile.",
     "affected_txn_ids": [
@@ -146,7 +148,8 @@
     ],
     "summary": "Local detectors found pattern undocumented for flagged transaction 3514948. Evidence includes 3 affected transaction(s) and 21 connected card(s).",
     "written_to_graph": false,
-    "graph_case_id": ""
+    "graph_case_id": "",
+    "fraud_probability_raw": 0.9
   },
   "evidence_requests": [],
   "next_best_actions": {
@@ -199,7 +202,7 @@
   "sar": {
     "file": true,
     "reason": "R9: coordinated undocumented activity requires a report",
-    "narrative": "Local detectors found pattern undocumented for flagged transaction 3514948. Evidence includes 3 affected transaction(s) and 21 connected card(s).",
+    "narrative": "Customer C09933 and card C09933-K2 are associated with flagged transaction 3514948. The activity occurred during the investigation window beginning on 2016-12-05. The observed channel and transaction sequence were assessed as pattern undocumented. The investigation identified 3 affected transaction(s) with total exposure of $241.87. The evidence is suspicious because the activity is inconsistent with the available customer and transaction context. The recommended response is governed by the cited policy rules and remains subject to the displayed approval route.",
     "subjects": [
       "C09933",
       "C09933-K2",

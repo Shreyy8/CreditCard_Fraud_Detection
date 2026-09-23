@@ -12,20 +12,33 @@ async def health():
     dl = get_data_layer()
     tg_ok = False
     mcp_ok = False
+    mcp_health = {
+        "available": False,
+        "tool_count": 0,
+        "tools": [],
+        "required_tools": [],
+        "missing_required_tools": [],
+        "error": "MCP session did not open",
+        "ready": False,
+    }
     try:
         tg_ok = await get_client().ping()
     except Exception:
         pass
     try:
         async with get_mcp_investigation_client() as mcp:
-            mcp_ok = mcp.available and mcp.tool_count > 0
+            mcp_health = await mcp.health_check()
+            mcp_ok = mcp_health["ready"]
     except Exception:
         pass
     settings = get_settings()
     return {
         "status": "ok" if tg_ok and mcp_ok else "degraded",
         "tigergraph": "connected" if tg_ok else "unavailable",
-        "mcp": "connected" if mcp_ok else "unavailable",
+        "mcp": {
+            "status": "connected" if mcp_ok else "unavailable",
+            **mcp_health,
+        },
         "llm": {
             "provider": settings.llm_provider,
             "model": settings.llm_model,
