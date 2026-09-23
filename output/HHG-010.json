@@ -1,119 +1,534 @@
 {
   "case_id": "HHG-010",
-  "generated_at": "2026-09-23T19:08:09.559454+00:00",
-  "schema_version": "1.0",
-  "metadata": {
-    "customer_id": "C10434",
+  "trigger": {
+    "type": "risk_score",
+    "text": "Real-time model scored transaction 3506725 ($1,000.03, online) at 0.90. Review and decide.",
+    "transaction_id": "3506725",
     "card_id": "C10434-K1",
-    "flagged_txn_id": "3506725",
-    "opened_at": "2016-12-02 18:18:27",
-    "trigger_type": "risk_score",
-    "risk_score": 0.9
+    "customer_id": "C10434"
   },
-  "counts": {
-    "summary_audit_trail": 6,
-    "tigergraph_gsql_subgraph": 6,
-    "evidence_customer_validation": 15,
-    "policy_enforcement_routing": 2,
-    "graph_memory_bank": 5
-  },
-  "summary_audit_trail": {
-    "executive_summary": "Investigation summary for HHG-010.",
-    "stop_reason": "Case persisted after evidence review and policy evaluation.",
-    "timeline": [
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 0.71,
+    "pattern": "none",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3506725"
+    ],
+    "first_suspicious_txn_id": "3506725",
+    "connected_card_ids": [],
+    "connected_device_profiles": [],
+    "exposure_usd": 0.0,
+    "evidence": [
       {
-        "step": 1,
-        "event": "Case opened",
-        "source": "case_pack"
+        "claim": "Alert triggered by risk_score: Real-time model scored transaction 3506725 ($1,000.03, online) at 0.90. Review and decide.",
+        "source": "document",
+        "ref": "case_pack.csv",
+        "entity_ids": [
+          "3506725",
+          "C10434-K1"
+        ]
       },
       {
-        "step": 2,
-        "event": "Flagged transaction reviewed",
-        "source": "risk_engine"
+        "claim": "Transaction device is newly associated with this account (id_15=New)",
+        "source": "graph",
+        "ref": "identity.csv:id_15",
+        "entity_ids": [
+          "3506725"
+        ]
       },
       {
-        "step": 3,
-        "event": "Graph evidence gathered",
-        "source": "tigergraph"
+        "claim": "MCP verified Transaction_Fraud result for 3506725",
+        "source": "graph",
+        "ref": "mcp:Transaction_Fraud",
+        "entity_ids": [
+          "3506725"
+        ]
       },
       {
-        "step": 4,
-        "event": "Customer validation checked",
-        "source": "customer_review"
+        "claim": "MCP verified get_customer_history result for C10434",
+        "source": "graph",
+        "ref": "mcp:get_customer_history",
+        "entity_ids": [
+          "C10434"
+        ]
       },
       {
-        "step": 5,
-        "event": "Policy rules applied",
-        "source": "policy_engine"
+        "claim": "MCP verified find_connected_cards result for C10434-K1",
+        "source": "graph",
+        "ref": "mcp:find_connected_cards",
+        "entity_ids": [
+          "C10434-K1"
+        ]
       },
       {
-        "step": 6,
-        "event": "Case saved",
-        "source": "case_store"
+        "claim": "MCP verified find_shared_identity result for 3506725",
+        "source": "graph",
+        "ref": "mcp:find_shared_identity",
+        "entity_ids": [
+          "3506725"
+        ]
+      },
+      {
+        "claim": "MCP verified find_prior_fraud_cases result for C10434, C10434-K1",
+        "source": "graph",
+        "ref": "mcp:find_prior_fraud_cases",
+        "entity_ids": [
+          "C10434",
+          "C10434-K1"
+        ]
+      },
+      {
+        "claim": "MCP verified find_behavioral_anomalies result for C10434-K1",
+        "source": "graph",
+        "ref": "mcp:find_behavioral_anomalies",
+        "entity_ids": [
+          "C10434-K1"
+        ]
+      },
+      {
+        "claim": "MCP verified find_card_transactions result for C10434-K1",
+        "source": "graph",
+        "ref": "mcp:find_card_transactions",
+        "entity_ids": [
+          "C10434-K1"
+        ]
+      },
+      {
+        "claim": "Transaction 3506725: $1000.03 via online channel, product ?, risk_score=0.9",
+        "source": "graph",
+        "ref": "Transaction_Fraud",
+        "entity_ids": [
+          "3506725"
+        ]
+      },
+      {
+        "claim": "Identity record: device=Windows, OS=?, browser=?, device_status=?",
+        "source": "graph",
+        "ref": "Transaction_Fraud",
+        "entity_ids": [
+          "3506725"
+        ]
+      },
+      {
+        "claim": "Transaction 3506725: $? via ? at ?, risk_score=?, card_network= (), billing_country=",
+        "source": "document",
+        "ref": "transactions_clean.csv",
+        "entity_ids": [
+          "3506725"
+        ]
+      },
+      {
+        "claim": "Alert: Real-time model scored transaction 3506725 ($1,000.03, online) at 0.90. Review and decide.",
+        "source": "document",
+        "ref": "case_pack.csv",
+        "entity_ids": [
+          "3506725",
+          "C10434-K1"
+        ]
+      },
+      {
+        "claim": "Identity record for 3506725: device=Windows, OS=Windows 10, browser=edge 16.0, device_status=New [FLAGS: NEW DEVICE (id_15=New)]",
+        "source": "document",
+        "ref": "identity.csv",
+        "entity_ids": [
+          "3506725"
+        ]
+      },
+      {
+        "claim": "MCP Transaction_Fraud: verified result",
+        "source": "graph",
+        "ref": "mcp:Transaction_Fraud",
+        "entity_ids": [
+          "3506725"
+        ]
       }
     ],
-    "audit_actions": [
-      "Created case record",
-      "Checked trigger event",
-      "Loaded transaction context",
-      "Evaluated graph relationships",
-      "Validated customer/device evidence",
-      "Computed policy decision"
-    ]
-  },
-  "tigergraph_gsql_subgraph": {
-    "graph_name": "FraudCaseGraph",
-    "query_set": [
-      "get_transaction_context",
-      "find_connected_cards",
-      "find_shared_identity",
-      "find_prior_fraud_cases",
-      "detect_new_device",
-      "detect_cnp_burst"
+    "similar_prior_cases": [
+      "CC-0873",
+      "CC-4885",
+      "CC-2237",
+      "CC-0910",
+      "CC-0433"
     ],
-    "nodes": [],
-    "edges": [],
-    "summary": "Graph subgraph generated for HHG-010."
+    "summary": "Case HHG-010: risk score on card C10434-K1 (customer C10434), $unknown unknown transaction. Pattern assessed as none (p=0.71), verdict: fraud. Estimated exposure: undetermined. 0 prior confirmed fraud case(s) on this customer. Evidence: 22 item(s) gathered from graph and local data.",
+    "written_to_graph": true,
+    "graph_case_id": "HHG-010"
   },
-  "evidence_customer_validation": {
-    "customer_validation": [],
-    "transaction_evidence": [],
-    "pattern_matches": [],
-    "supporting_data": [
-      "case_pack.csv",
-      "transactions.csv",
-      "identity.csv",
-      "closed_cases_history.csv"
-    ]
+  "evidence_requests": [],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "MONITOR_CARD",
+        "route": "auto",
+        "reason": "Medium risk p=0.71. Monitor card."
+      },
+      {
+        "action": "STEP_UP_AUTH",
+        "route": "auto",
+        "reason": "Medium risk — require step-up before further transactions."
+      }
+    ],
+    "final": [
+      {
+        "action": "MONITOR_CARD",
+        "route": "auto",
+        "reason": "Medium risk p=0.71. Monitor card."
+      },
+      {
+        "action": "STEP_UP_AUTH",
+        "route": "auto",
+        "reason": "Medium risk — require step-up before further transactions."
+      }
+    ],
+    "what_changed": "nothing"
   },
-  "policy_enforcement_routing": {
-    "rules_executed": [],
-    "routing_decisions": [],
-    "final_actions": []
+  "sar": {
+    "file": false,
+    "reason": "No FILE_REPORT action in final recommendations — SAR not required.",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0.0,
+    "activity_dates": []
   },
-  "fin_cen_sar_report": {
-    "required": false,
-    "report_generated": false,
-    "file_name": "",
-    "report_summary": "",
-    "fields": {
-      "total_exposure_usd": 0.0,
-      "case_count": 1,
-      "suspicious_activity_summary": "",
-      "reporting_status": "not_required"
+  "stop_reason": "Investigation completed — all applicable policy rules evaluated.",
+  "tool_calls": 21,
+  "llm_calls": 1,
+  "tokens": 0,
+  "latency_s": 4.71,
+  "runtime": {
+    "tigergraph": "CONNECTED",
+    "mcp": "AVAILABLE",
+    "llm": "AVAILABLE",
+    "graphrag": "AVAILABLE"
+  },
+  "audit": [
+    {
+      "step": 1,
+      "action": "gather_evidence",
+      "status": "start",
+      "timestamp": "2026-09-23T19:06:03.021823+00:00"
+    },
+    {
+      "step": 1,
+      "action": "mcp_graph_access",
+      "status": "complete",
+      "timestamp": "2026-09-23T19:06:06.912948+00:00",
+      "calls": 7,
+      "successful_calls": 7,
+      "queries": [
+        "Transaction_Fraud",
+        "get_customer_history",
+        "find_connected_cards",
+        "find_shared_identity",
+        "find_prior_fraud_cases",
+        "find_behavioral_anomalies",
+        "find_card_transactions"
+      ]
+    },
+    {
+      "step": 1,
+      "action": "gather_evidence",
+      "status": "complete",
+      "timestamp": "2026-09-23T19:06:07.206868+00:00",
+      "history_txns": 36,
+      "identity_available": true,
+      "prior_cases": 1,
+      "mcp_status": "AVAILABLE"
+    },
+    {
+      "step": 2,
+      "action": "pattern_detection",
+      "status": "start",
+      "timestamp": "2026-09-23T19:06:07.206886+00:00"
+    },
+    {
+      "step": 2,
+      "action": "pattern_detection",
+      "status": "complete",
+      "timestamp": "2026-09-23T19:06:07.206935+00:00",
+      "pattern": "none",
+      "confidence": 0.1
+    },
+    {
+      "step": 3,
+      "action": "risk_assessment",
+      "status": "start",
+      "timestamp": "2026-09-23T19:06:07.206939+00:00"
+    },
+    {
+      "step": 3,
+      "action": "risk_assessment",
+      "status": "complete",
+      "timestamp": "2026-09-23T19:06:07.206976+00:00",
+      "risk_score": 0.71,
+      "level": "HIGH",
+      "confidence": 0.667
+    },
+    {
+      "step": 4,
+      "action": "llm_reasoning",
+      "status": "start",
+      "timestamp": "2026-09-23T19:06:07.206979+00:00"
+    },
+    {
+      "step": 4,
+      "action": "llm_reasoning",
+      "status": "complete",
+      "timestamp": "2026-09-23T19:06:07.316713+00:00",
+      "fraud_probability": 0.71
+    },
+    {
+      "step": 5,
+      "action": "exposure_calculation",
+      "status": "start",
+      "timestamp": "2026-09-23T19:06:07.316724+00:00"
+    },
+    {
+      "step": 5,
+      "action": "exposure_calculation",
+      "status": "complete",
+      "timestamp": "2026-09-23T19:06:07.316743+00:00",
+      "exposure_usd": 0.0,
+      "affected_txns": 1
+    },
+    {
+      "step": 6,
+      "action": "initial_recommendation",
+      "status": "start",
+      "timestamp": "2026-09-23T19:06:07.316746+00:00"
+    },
+    {
+      "step": 6,
+      "action": "initial_recommendation",
+      "status": "complete",
+      "timestamp": "2026-09-23T19:06:07.316779+00:00",
+      "actions": [
+        "MONITOR_CARD",
+        "STEP_UP_AUTH"
+      ]
+    },
+    {
+      "step": 7,
+      "action": "uncertainty_check",
+      "status": "start",
+      "timestamp": "2026-09-23T19:06:07.316804+00:00"
+    },
+    {
+      "step": 7,
+      "action": "uncertainty_check",
+      "status": "complete",
+      "timestamp": "2026-09-23T19:06:07.316811+00:00",
+      "need_more_evidence": false
+    },
+    {
+      "step": 9,
+      "action": "sar_check",
+      "status": "start",
+      "timestamp": "2026-09-23T19:06:07.316818+00:00"
+    },
+    {
+      "step": 9,
+      "action": "sar_check",
+      "status": "complete",
+      "timestamp": "2026-09-23T19:06:07.316832+00:00",
+      "file_sar": false
+    },
+    {
+      "step": 10,
+      "action": "case_memory_write",
+      "status": "start",
+      "timestamp": "2026-09-23T19:06:07.316835+00:00"
+    },
+    {
+      "step": 10,
+      "action": "case_memory_readback",
+      "status": "failed",
+      "timestamp": "2026-09-23T19:06:07.734802+00:00",
+      "case_id": "HHG-010"
+    },
+    {
+      "step": 10,
+      "action": "case_memory_write",
+      "status": "complete",
+      "timestamp": "2026-09-23T19:06:07.734816+00:00",
+      "written": true
     }
+  ],
+  "validation": {
+    "llm_context_source": "EvidencePack.to_llm_context",
+    "llm_context_sha256": "c9e5905aec214ec3280781d43decd933b410d21ac73d66ee6bd7697b279fe175",
+    "llm_context_keys": [
+      "behavioral_evidence",
+      "case_id",
+      "evidence_gaps",
+      "exposure",
+      "graph_evidence",
+      "historical_cases",
+      "mcp_evidence",
+      "metadata",
+      "policy_evidence",
+      "trigger",
+      "typology_evidence",
+      "uncertainties"
+    ],
+    "llm_context_chars": 13856,
+    "llm_raw_dataset_in_context": false,
+    "case_memory_readback": false
   },
-  "graph_memory_bank": {
-    "similar_prior_cases": [],
-    "historical_context": [],
-    "connected_entities": []
+  "case_memory": {
+    "written": true,
+    "graph_case_id": "HHG-010",
+    "readback": false
   },
-  "generated_artifacts": [
-    "summary_audit_trail",
-    "tigergraph_gsql_subgraph",
-    "evidence_customer_validation",
-    "policy_enforcement_routing",
-    "fin_cen_sar_report",
-    "graph_memory_bank"
-  ]
+  "action_decisions": {},
+  "policy_evidence": [
+    {
+      "rule_id": "R3",
+      "title": "Customer confirms the transaction",
+      "text": "Recommend CLOSE_NO_FRAUD. Note the confirmation in the case file.",
+      "triggers": [
+        "customer_confirmation"
+      ],
+      "actions": [
+        "CLOSE_NO_FRAUD"
+      ],
+      "fraud_types": [
+        "all"
+      ]
+    },
+    {
+      "rule_id": "R4",
+      "title": "No reply within 24 hours",
+      "text": "Recommend MONITOR_CARD and DECLINE_TRANSACTION for pending authorizations. Escalate if exposure exceeds $500.",
+      "triggers": [
+        "no_customer_reply"
+      ],
+      "actions": [
+        "MONITOR_CARD",
+        "DECLINE_TRANSACTION",
+        "ESCALATE_TO_ANALYST"
+      ],
+      "fraud_types": [
+        "all"
+      ]
+    },
+    {
+      "rule_id": "R6",
+      "title": "Shared origin across cards",
+      "text": "When several cards show fraud from the same device profile, billing region, or recipient email in one window, name the shared element, recommend CREATE_CASE and FILE_REPORT, and MONITOR_CONNECTED_CARDS for every card that shares it.",
+      "triggers": [
+        "shared_device",
+        "shared_region",
+        "multi_card"
+      ],
+      "actions": [
+        "CREATE_CASE",
+        "FILE_REPORT",
+        "MONITOR_CONNECTED_CARDS"
+      ],
+      "fraud_types": [
+        "all"
+      ]
+    },
+    {
+      "rule_id": "R10",
+      "title": "BLOCK_ALL_CARDS threshold",
+      "text": "Never BLOCK_ALL_CARDS unless at least two of the customer's cards show confirmed fraud or the customer's credentials are confirmed compromised.",
+      "triggers": [
+        "multi_card_fraud",
+        "credential_compromise"
+      ],
+      "actions": [
+        "BLOCK_ALL_CARDS"
+      ],
+      "fraud_types": [
+        "account_takeover"
+      ]
+    },
+    {
+      "doc_id": "SAR_POLICY",
+      "title": "Suspicious Activity Report filing criteria",
+      "source": "Fraud Policy v1.0 section 3a",
+      "text": "File a SAR (FILE_REPORT) when fraud is confirmed or strongly suspected AND at least one of: exposure > $1,000; activity connects to shared device profile, shared region cluster, or another customer's fraud; pattern is coordinated or undocumented (rule R9). A SAR always has a case behind it. Most cases never need a report. The report narrative must stand on its own: who, what, when, where, how, and why it is suspicious."
+    }
+  ],
+  "typology_evidence": [
+    {
+      "typology_id": "undocumented",
+      "name": "Undocumented Pattern",
+      "description": "Activity fitting none of the five known patterns but showing coordinated or repeated suspicious behavior across accounts. Describe in your own words; do not force into a known category. Policy R9.",
+      "indicators": [
+        "shared device across multiple cards",
+        "coordinated timing",
+        "multiple customers affected",
+        "does not fit R1-R10 cleanly"
+      ],
+      "policy_rules": [
+        "R9"
+      ]
+    }
+  ],
+  "lifecycle_state": "CLOSED",
+  "initial_assessment": {
+    "fraud_probability": 0.71,
+    "risk_score": 0.71,
+    "confidence": 0.667,
+    "pattern": "none",
+    "actions": [
+      {
+        "action": "MONITOR_CARD",
+        "route": "auto",
+        "reason": "Medium risk p=0.71. Monitor card."
+      },
+      {
+        "action": "STEP_UP_AUTH",
+        "route": "auto",
+        "reason": "Medium risk — require step-up before further transactions."
+      }
+    ],
+    "uncertainty": [
+      "No prior confirmed fraud to corroborate model score",
+      "Customer C10434 has no transactions in graph",
+      "No shared identity signals found for transaction 3506725",
+      "No prior fraud cases in graph for customer C10434 / card C10434-K1"
+    ],
+    "evidence_count": 2
+  },
+  "reassessment_history": [],
+  "explanation": {
+    "summary": "Case HHG-010: risk score on card C10434-K1 (customer C10434), $unknown unknown transaction. Pattern assessed as none (p=0.71), verdict: fraud. Estimated exposure: undetermined. 0 prior confirmed fraud case(s) on this customer. Evidence: 22 item(s) gathered from graph and local data.",
+    "evidence_used": [
+      "case_pack.csv",
+      "identity.csv:id_15",
+      "mcp:Transaction_Fraud",
+      "mcp:get_customer_history",
+      "mcp:find_connected_cards",
+      "mcp:find_shared_identity",
+      "mcp:find_prior_fraud_cases",
+      "mcp:find_behavioral_anomalies",
+      "mcp:find_card_transactions",
+      "Transaction_Fraud",
+      "Transaction_Fraud",
+      "transactions_clean.csv",
+      "case_pack.csv",
+      "identity.csv",
+      "mcp:Transaction_Fraud"
+    ],
+    "missing_evidence": [
+      "No prior confirmed fraud to corroborate model score",
+      "Customer C10434 has no transactions in graph",
+      "No shared identity signals found for transaction 3506725",
+      "No prior fraud cases in graph for customer C10434 / card C10434-K1"
+    ],
+    "why_evidence_requested": [],
+    "remaining_uncertainty": [
+      "No prior confirmed fraud to corroborate model score",
+      "Customer C10434 has no transactions in graph",
+      "No shared identity signals found for transaction 3506725",
+      "No prior fraud cases in graph for customer C10434 / card C10434-K1"
+    ],
+    "stop_reason": "Investigation completed — all applicable policy rules evaluated."
+  }
 }
