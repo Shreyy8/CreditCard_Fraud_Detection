@@ -90,8 +90,30 @@ class CaseManager:
     def __init__(self) -> None:
         _init_db()
 
+    @staticmethod
+    def _output_document(answer: CaseAnswer) -> dict[str, Any]:
+        """Build the concise, human-readable investigation report artifact."""
+        return {
+            "case_id": answer.case_id,
+            "case": answer.case.model_dump(mode="json"),
+            "evidence_requests": [
+                {
+                    "type": request.type.value,
+                    "asked_after_step": request.asked_after_step,
+                    "assumed_response": request.assumed_response,
+                }
+                for request in answer.evidence_requests
+            ],
+            "next_best_actions": answer.next_best_actions.model_dump(mode="json"),
+            "sar": answer.sar.model_dump(mode="json"),
+            "stop_reason": answer.stop_reason,
+            "tool_calls": answer.tool_calls,
+            "tokens": answer.tokens,
+            "latency_s": answer.latency_s,
+        }
+
     def write_answer_file(self, answer: CaseAnswer) -> Path:
-        """Persist the complete investigation answer as an atomic JSON artifact."""
+        """Persist a concise investigation report as an atomic JSON artifact."""
         case_id = answer.case_id
         if not case_id or Path(case_id).name != case_id:
             raise ValueError("case_id must be a simple filename")
@@ -99,7 +121,9 @@ class CaseManager:
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         destination = OUTPUT_DIR / f"{case_id}.json"
         temporary = destination.with_suffix(".json.tmp")
-        temporary.write_text(answer.model_dump_json(indent=2), encoding="utf-8")
+        temporary.write_text(
+            json.dumps(self._output_document(answer), indent=2), encoding="utf-8"
+        )
         os.replace(temporary, destination)
         return destination
 
