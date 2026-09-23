@@ -7,6 +7,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.api import investigations
+from app.cases import case_manager
 from app.cases.case_manager import CaseManager
 from app.models.case import (
     ActionRecommendation,
@@ -260,3 +262,57 @@ def test_investigations_endpoints(client):
     # 404 for missing investigation
     not_found = client.get("/investigations/UNKNOWN_INV_ID")
     assert not_found.status_code == 404
+
+
+def test_investigation_reuses_cached_answer(client, seed_test_case, monkeypatch):
+    """A repeated run must not invoke the agent or consume another LLM call."""
+    class Pack:
+        @staticmethod
+        def get_case_pack_row(case_id):
+            return {"case_id": case_id}
+
+    class AgentMustNotRun:
+        async def investigate(self, _row):
+            raise AssertionError("cached investigation should not run the agent")
+
+    monkeypatch.setattr(investigations, "get_data_layer", lambda: Pack())
+    monkeypatch.setattr(investigations, "FraudAgent", AgentMustNotRun)
+    monkeypatch.setattr(investigations._mgr, "get_answer", lambda _case_id: seed_test_case)
+
+    response = client.post("/investigations/run", json={"case_id": "HHG-001"})
+
+    assert response.status_code == 200
+    assert response.json()["case_id"] == "HHG-999"
+
+
+def test_run_all_reports_cached_cases(client, seed_test_case, monkeypatch):
+    class Pack:
+        @staticmethod
+        def get_all_case_pack_rows():
+            return [{"case_id": "HHG-001"}, {"case_id": "HHG-002"}]
+
+    class AgentMustNotRun:
+        async def investigate(self, _row):
+            raise AssertionError("cached batch cases should not run the agent")
+
+    monkeypatch.setattr(investigations, "get_data_layer", lambda: Pack())
+    monkeypatch.setattr(investigations, "FraudAgent", AgentMustNotRun)
+    monkeypatch.setattr(investigations._mgr, "get_answer", lambda _case_id: seed_test_case)
+
+    response = client.post("/investigations/run-all", json={})
+
+    assert response.status_code == 200
+    assert response.json()["completed"] == 0
+    assert response.json()["cached"] == 2
+    assert response.json()["failed"] == 0
+
+
+def test_saved_answer_is_exported_as_json(seed_test_case, monkeypatch, tmp_path):
+    monkeypatch.setattr(case_manager, "OUTPUT_DIR", tmp_path)
+
+    CaseManager().save_answer(seed_test_case)
+
+    artifact = tmp_path / "HHG-999.json"
+    assert artifact.exists()
+    assert artifact.read_text(encoding="utf-8")
+    assert artifact.read_text(encoding="utf-8").startswith("{")

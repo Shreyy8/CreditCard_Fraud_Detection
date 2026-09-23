@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import sqlite3
 from uuid import uuid4
 from contextlib import contextmanager
@@ -18,6 +19,7 @@ from ..models.case import CaseAnswer, CaseStatus, InvestigationState, Verdict
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
+OUTPUT_DIR = Path(__file__).resolve().parents[3] / "output"
 
 
 def _db_path() -> str:
@@ -88,6 +90,19 @@ class CaseManager:
     def __init__(self) -> None:
         _init_db()
 
+    def write_answer_file(self, answer: CaseAnswer) -> Path:
+        """Persist the complete investigation answer as an atomic JSON artifact."""
+        case_id = answer.case_id
+        if not case_id or Path(case_id).name != case_id:
+            raise ValueError("case_id must be a simple filename")
+
+        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        destination = OUTPUT_DIR / f"{case_id}.json"
+        temporary = destination.with_suffix(".json.tmp")
+        temporary.write_text(answer.model_dump_json(indent=2), encoding="utf-8")
+        os.replace(temporary, destination)
+        return destination
+
     def save_answer(self, answer: CaseAnswer) -> None:
         with _conn() as con:
             con.execute(
@@ -119,6 +134,7 @@ class CaseManager:
                      json.dumps(request.response), request.created_at.isoformat(),
                      request.received_at.isoformat() if request.received_at else None),
                 )
+        self.write_answer_file(answer)
 
     def get_answer(self, case_id: str) -> Optional[CaseAnswer]:
         with _conn() as con:
