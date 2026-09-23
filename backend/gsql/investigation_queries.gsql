@@ -1,26 +1,7 @@
 // ============================================================
 // TigerGraph GSQL — Fraud Investigation Queries
-// Graph    : FraudCaseGraph
-// TG Ver   : 4.2.5  (Savanna)
-// Verified : syntax tested against live workspace 2026-09-20
-//
-// Vertex types : FraudCase, Transaction, Card, Customer, Identity
-// Edge types   :
-//   case_flagged_transaction              FraudCase  -> Transaction
-//   case_involves_card                   FraudCase  -> Card
-//   case_involves_customer               FraudCase  -> Customer
-//   closed_case_involves_customer        FraudCase  -> Customer
-//   closed_case_involves_card            FraudCase  -> Card
-//   closed_case_first_fraud_transaction  FraudCase  -> Transaction
-//   transaction_belongs_to_card          Transaction -> Card
-//   transaction_belongs_to_customer      Transaction -> Customer
-//   transaction_has_identity             Transaction -> Identity
-//
-// Primary-ID lookup pattern (V1 compatible):
-//   VERTEX src = TO_VERTEX(id_param, "VertexType");
-//   SeedSet = {src};
-//
-// Reverse-edge traversal: use the edge name with :e alias — works both ways.
+// Graph    : FraudCaseGraph (or graph in use)
+// TG Ver   : 4.x (Savanna)
 // ============================================================
 
 // ── 1. Transaction_Fraud — main entry-point query ─────────────────────────────
@@ -77,7 +58,7 @@ FOR GRAPH FraudCaseGraph {
   OtherTxns  = SELECT t2 FROM Customers:cu -(transaction_belongs_to_customer:e)- Transaction:t2;
   OtherCards = SELECT c2 FROM OtherTxns:t2 -(transaction_belongs_to_card)-       Card:c2
                WHERE c2 != card
-               ACCUM @@connected += c2;
+               ACCUM @@connected += c2.id;
 
   PRINT @@connected AS card_ids;
 }
@@ -91,7 +72,7 @@ FOR GRAPH FraudCaseGraph {
   Identities = SELECT i  FROM SeedSet:t  -(transaction_has_identity)- Identity:i;
   OtherTxns  = SELECT t2 FROM Identities:i -(transaction_has_identity:e)- Transaction:t2
                WHERE t2 != txn
-               ACCUM @@id_to_txns += (i -> t2);
+               ACCUM @@id_to_txns += (i.id -> t2.id);
 
   PRINT OtherTxns, @@id_to_txns AS shared_signals;
 }
@@ -120,7 +101,7 @@ FOR GRAPH FraudCaseGraph {
   Seed = {txn_set};
   T = SELECT t FROM Seed:t
       ACCUM @@total += abs(t.transaction_amt),
-            @@included += getvid(t);
+            @@included += t.id;
 
   PRINT @@total AS exposure_usd, @@included AS included_txns;
 }
@@ -148,12 +129,12 @@ FOR GRAPH FraudCaseGraph {
 
   SeedSet = {card};
   Txns = SELECT t FROM SeedSet:c -(transaction_belongs_to_card:e)- Transaction:t
-         ORDER BY t.ts DESC
-         LIMIT 100
          ACCUM @@count += 1,
                @@total_amt += t.transaction_amt,
                @@max_amt += t.transaction_amt,
-               @@min_amt += t.transaction_amt;
+               @@min_amt += t.transaction_amt
+         ORDER BY t.ts DESC
+         LIMIT 100;
 
   PRINT @@count AS txn_count, @@total_amt AS total_amount,
         @@max_amt AS max_amount, @@min_amt AS min_amount, Txns;
@@ -188,9 +169,9 @@ CREATE OR REPLACE QUERY link_fraud_case(
   C  = SELECT c  FROM CardSeed:c;
   CU = SELECT cu FROM CustSeed:cu;
 
-  INSERT INTO case_flagged_transaction VALUES (FC, T);
-  INSERT INTO case_involves_card        VALUES (FC, C);
-  INSERT INTO case_involves_customer    VALUES (FC, CU);
+  INSERT INTO case_flagged_transaction VALUES (fraud_case, txn);
+  INSERT INTO case_involves_card        VALUES (fraud_case, card);
+  INSERT INTO case_involves_customer    VALUES (fraud_case, customer);
 
   PRINT FC, T, C, CU;
 }
