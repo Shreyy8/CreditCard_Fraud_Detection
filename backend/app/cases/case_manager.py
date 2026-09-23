@@ -132,6 +132,14 @@ class CaseManager:
             ).fetchall()
         return [dict(r) for r in rows]
 
+    def list_answers(self, limit: int = 100) -> list[CaseAnswer]:
+        with _conn() as con:
+            rows = con.execute(
+                "SELECT answer_json FROM cases ORDER BY created_at DESC LIMIT ?",
+                (limit,),
+            ).fetchall()
+        return [CaseAnswer.model_validate_json(row[0]) for row in rows if row[0]]
+
     def log_audit(self, case_id: str, entries: list[dict]) -> None:
         with _conn() as con:
             for e in entries:

@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .api.cases import router as cases_router
 from .api.health import router as health_router
 from .api.investigations import router as investigations_router
+from .api.policy import router as policy_router
 from .config import get_settings
 
 settings = get_settings()
@@ -38,6 +39,7 @@ app.add_middleware(
 app.include_router(health_router)
 app.include_router(cases_router)
 app.include_router(investigations_router)
+app.include_router(policy_router)
 
 
 @app.on_event("startup")

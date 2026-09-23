@@ -14,17 +14,21 @@ import {
   ArrowUpRight
 } from 'lucide-react';
 import { BENCHMARK_METRICS } from '../data/cases';
-import { BenchmarkCase } from '../types';
+import { BenchmarkCase, BenchmarkRunStats } from '../types';
+import type { CaseStatsResponse } from '../api/client';
 
 interface BenchmarkDashboardProps {
   cases: BenchmarkCase[];
   onSelectCase: (caseId: string) => void;
+  stats?: CaseStatsResponse | BenchmarkRunStats;
 }
 
 export const BenchmarkDashboard: React.FC<BenchmarkDashboardProps> = ({
   cases,
-  onSelectCase
+  onSelectCase,
+  stats,
 }) => {
+  const activeMetrics = stats || BENCHMARK_METRICS;
   return (
     <div className="space-y-6">
       {/* Top Banner */}
@@ -63,7 +67,7 @@ export const BenchmarkDashboard: React.FC<BenchmarkDashboardProps> = ({
             <Target className="w-4 h-4 text-blue-600" />
           </div>
           <div className="text-2xl font-bold font-mono text-slate-900 mt-2">
-            {(BENCHMARK_METRICS.f1_score * 100).toFixed(1)}%
+            {(activeMetrics.f1_score * 100).toFixed(1)}%
           </div>
           <div className="text-[11px] font-mono text-emerald-700 mt-1 flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3 text-emerald-600" />
@@ -78,7 +82,7 @@ export const BenchmarkDashboard: React.FC<BenchmarkDashboardProps> = ({
             <CheckCircle2 className="w-4 h-4 text-blue-600" />
           </div>
           <div className="text-2xl font-bold font-mono text-slate-900 mt-2">
-            {(BENCHMARK_METRICS.policy_compliance_rate * 100).toFixed(0)}%
+            {(activeMetrics.policy_compliance_rate * 100).toFixed(0)}%
           </div>
           <div className="text-[11px] font-mono text-emerald-700 mt-1 flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3 text-emerald-600" />
@@ -93,7 +97,7 @@ export const BenchmarkDashboard: React.FC<BenchmarkDashboardProps> = ({
             <Zap className="w-4 h-4 text-blue-600" />
           </div>
           <div className="text-2xl font-bold font-mono text-slate-900 mt-2">
-            {(BENCHMARK_METRICS.action_accuracy_rate * 100).toFixed(1)}%
+            {(activeMetrics.action_accuracy_rate * 100).toFixed(1)}%
           </div>
           <div className="text-[11px] font-mono text-emerald-700 mt-1 flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3 text-emerald-600" />
@@ -108,7 +112,7 @@ export const BenchmarkDashboard: React.FC<BenchmarkDashboardProps> = ({
             <Clock className="w-4 h-4 text-blue-600" />
           </div>
           <div className="text-2xl font-bold font-mono text-slate-900 mt-2">
-            {BENCHMARK_METRICS.average_latency_s.toFixed(2)}s
+            {activeMetrics.average_latency_s.toFixed(2)}s
           </div>
           <div className="text-[11px] font-mono text-emerald-700 mt-1 flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3 text-emerald-600" />

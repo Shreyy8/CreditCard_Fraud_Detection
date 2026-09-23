@@ -32,6 +32,7 @@ export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
   selectedCaseId,
+  cases,
   pendingApprovalsCount
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
@@ -55,7 +56,7 @@ export const Header: React.FC<HeaderProps> = ({
       id: 'queue' as ActiveTab,
       label: 'Case Queue',
       icon: <Layers className="w-4 h-4" />,
-      badge: '20'
+      badge: String(cases.length)
     },
     {
       id: 'detail' as ActiveTab,
