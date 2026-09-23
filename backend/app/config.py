@@ -62,10 +62,10 @@ class Settings(BaseSettings):
     secret_key: str = "dev-secret-key"
 
     # ── Datasets ──────────────────────────────────────────────────────────────
-    transactions_csv: str = "Datasets/transactions_clean.csv"
-    identity_csv: str = "Datasets/identity.csv"
-    closed_cases_csv: str = "Datasets/closed_cases_history.csv"
-    case_pack_csv: str = "Datasets/case_pack.csv"
+    transactions_csv: str = "artifacts/transaction_cards.csv"
+    identity_csv: str = "DataSet/identity.csv"
+    closed_cases_csv: str = "DataSet/closed_cases_history.csv"
+    case_pack_csv: str = "DataSet/case_pack.csv"
 
     @property
     def savanna_api_key(self) -> str:

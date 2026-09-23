@@ -23,15 +23,21 @@ settings = get_settings()
 
 def get_conn():
     import pyTigerGraph as tg
-    host = settings.tigergraph_host
+    host = settings.tigergraph_host.rstrip("/")
+    is_tgcloud = "tgcloud.io" in host.lower()
     conn = tg.TigerGraphConnection(
         host=host,
         graphname=settings.tigergraph_graph_name,
-        gsqlSecret=settings.tigergraph_secret,
-        tgCloud="tgcloud.io" in host.lower(),
+        gsqlSecret=settings.tigergraph_secret or "",
+        username=settings.tigergraph_username or "tigergraph",
+        password=settings.tigergraph_password or "",
+        tgCloud=is_tgcloud,
     )
-    res = conn.getToken(settings.tigergraph_secret)
-    conn.apiToken = res[0] if isinstance(res, (tuple, list)) else str(res)
+    if settings.tigergraph_token:
+        conn.apiToken = settings.tigergraph_token
+    elif settings.tigergraph_secret:
+        res = conn.getToken(settings.tigergraph_secret)
+        conn.apiToken = res[0] if isinstance(res, (tuple, list)) else str(res)
     return conn
 
 
@@ -95,7 +101,7 @@ def install_all() -> int:
             print(f"FAIL\n    {exc}")
             failed += 1
 
-    print(f"\n{'─'*50}")
+    print(f"\n--------------------------------------------------")
     print(f"Installed: {installed}   Failed: {failed}")
     return 0 if failed == 0 else 1
 

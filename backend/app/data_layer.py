@@ -29,18 +29,26 @@ _PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 
 def _resolve_path(setting_path: str) -> str:
-    """Return absolute path, resolving relative paths from project root."""
-    p = Path(setting_path)
+    """Return absolute path, resolving relative paths from cwd then project root.
+
+    The function expands ``~`` and, if the path is not absolute, first checks
+    ``Path.cwd() / setting_path``. If that file exists, its resolved absolute
+    path is returned. Otherwise it checks the path relative to ``_PROJECT_ROOT``.
+    If neither exists, the original string is returned (the caller will handle
+    missing files).
+    """
+    p = Path(setting_path).expanduser()
     if p.is_absolute():
-        return str(p)
-    # Try relative to cwd first
-    if p.exists():
-        return str(p)
-    # Try relative to project root
-    candidate = _PROJECT_ROOT / p
-    if candidate.exists():
-        return str(candidate)
-    return str(p)  # Return original if not found — caller handles missing
+        return str(p.resolve())
+    cwd_candidate = Path.cwd() / p
+    resolved_cwd = cwd_candidate.resolve()
+    if resolved_cwd.exists():
+        return str(resolved_cwd)
+    root_candidate = _PROJECT_ROOT / p
+    resolved_root = root_candidate.resolve()
+    if resolved_root.exists():
+        return str(resolved_root)
+    return str(p)
 
 
 # ── Lazy-loaded data stores ───────────────────────────────────────────────────
