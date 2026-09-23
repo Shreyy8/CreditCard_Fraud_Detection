@@ -3,6 +3,8 @@ Integration tests for backend API routes verifying end-to-end communication
 between FastAPI endpoints and client expectations.
 """
 
+import json
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -314,5 +316,7 @@ def test_saved_answer_is_exported_as_json(seed_test_case, monkeypatch, tmp_path)
 
     artifact = tmp_path / "HHG-999.json"
     assert artifact.exists()
-    assert artifact.read_text(encoding="utf-8")
-    assert artifact.read_text(encoding="utf-8").startswith("{")
+    document = json.loads(artifact.read_text(encoding="utf-8"))
+    assert document["case_id"] == "HHG-999"
+    assert document["case"]["verdict"] == "fraud"
+    assert "runtime" not in document
