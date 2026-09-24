@@ -316,6 +316,9 @@ class FraudAgent:
                     )
                     state.evidence_received.append(simulated_response)
                     state.tool_calls += 1
+                    evidence_request.status = "fulfilled"
+                    evidence_request.response = simulated_response
+                    evidence_request.received_at = datetime.now(timezone.utc)
                     evidence_request.assumed_response = simulated_response.get("detail", "")
                     self._audit(audit, 7, "evidence_request", "simulated", {
                         "type": evidence_request.type.value,
@@ -441,7 +444,7 @@ class FraudAgent:
         seen = set()
         for case in prior_on_customer + prior_on_card:
             cid = case.get("case_id", "")
-            if cid not in seen:
+            if cid and cid != state.case_id and cid not in seen:
                 seen.add(cid)
                 state.prior_cases.append(case)
 
@@ -638,7 +641,13 @@ class FraudAgent:
         connected_cards = state.connected_entities.get("connected_cards", [])
         shared_devices = state.connected_entities.get("shared_devices", [])
         # Only include transactions we have positive evidence for
-        related = self._find_related_in_episode(state, card_txns)
+        # A customer report identifies the disputed transaction, but does not
+        # establish that every nearby card transaction is unauthorized.
+        related = (
+            []
+            if state.trigger_type == "customer_report"
+            else self._find_related_in_episode(state, card_txns)
+        )
         return self.exposure_engine.calculate(
             flagged_txn=txn,
             related_transactions=related,
@@ -986,16 +995,17 @@ class FraudAgent:
         fp = state.fraud_probability
         uncertainty = risk.uncertainty_flags
 
-        # A customer report must be explicitly validated before the automated
-        # decision can treat the authorization question as settled.
+        # A customer report is already authorization evidence. If follow-up is
+        # required, request additive analyst information instead of repeating
+        # the same customer denial.
         if state.trigger_type == "customer_report" and not state.evidence_received:
             return True, EvidenceRequest(
-                type=EvidenceRequestType.customer_validation,
+                type=EvidenceRequestType.analyst_info,
                 asked_after_step=state.step,
                 assumed_response="",
                 reason=(
-                    "Customer-reported activity requires authorization validation "
-                    "before the final action is determined (Policy R2/R3)."
+                    "Customer report is already authorization evidence; request "
+                    "additive analyst information before final action."
                 ),
             )
 
@@ -1229,13 +1239,14 @@ class FraudAgent:
         }
         try:
             graph_case_id = await self.tg.write_case_to_graph(case_data)
-            state.written_to_graph = bool(graph_case_id)
             state.graph_case_id = graph_case_id or ""
-            if state.written_to_graph:
+            state.written_to_graph = False
+            if graph_case_id:
                 readback = await self.tg.read_case_from_graph(graph_case_id)
                 state.validation["case_memory_readback"] = bool(
                     readback and str(readback.get("v_id", readback.get("primary_id", graph_case_id))) == graph_case_id
                 )
+                state.written_to_graph = state.validation["case_memory_readback"]
                 self._audit(state.audit_trail, 10, "case_memory_readback",
                             "complete" if state.validation["case_memory_readback"] else "failed",
                             {"case_id": graph_case_id})
@@ -1274,7 +1285,12 @@ class FraudAgent:
             connected_device_profiles=connected_device_profiles,
             exposure_usd=round(state.exposure_usd, 2),
             evidence=state.graph_evidence[:15],
-            similar_prior_cases=[c.get("case_id", "") for c in state.prior_cases[:5]],
+            similar_prior_cases=[
+                cid for cid in dict.fromkeys(
+                    c.get("case_id", "") for c in state.prior_cases
+                )
+                if cid and cid != state.case_id
+            ][:5],
             summary=self._generate_summary(state, exposure_obj),
             written_to_graph=state.written_to_graph,
             graph_case_id=state.graph_case_id,

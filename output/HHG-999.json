@@ -1,0 +1,70 @@
+{
+  "case_id": "HHG-999",
+  "case": {
+    "status": "open",
+    "verdict": "fraud",
+    "fraud_probability": 0.92,
+    "pattern": "card_testing",
+    "pattern_description": "Micro transactions followed by burst",
+    "affected_txn_ids": [
+      "9990001",
+      "9990002"
+    ],
+    "first_suspicious_txn_id": "9990001",
+    "connected_card_ids": [
+      "C99999-K2"
+    ],
+    "connected_device_profiles": [
+      "Linux | Chrome 54 | 1920x1080"
+    ],
+    "exposure_usd": 1250.5,
+    "evidence": [],
+    "similar_prior_cases": [
+      "CC-1001"
+    ],
+    "summary": "Confirmed card testing scenario.",
+    "written_to_graph": true,
+    "graph_case_id": "graph_HHG_999"
+  },
+  "evidence_requests": [],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "DECLINE_TRANSACTION",
+        "route": "L1",
+        "reason": "Card testing detected. Policy R5."
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "Card testing confirmed. Policy R5."
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "Exposure > $1000. Policy R2."
+      }
+    ],
+    "what_changed": "Added block and SAR after exposure calculation."
+  },
+  "sar": {
+    "file": true,
+    "reason": "Card testing above $1,000 threshold",
+    "narrative": "Suspicious card testing activity identified on account C99999.",
+    "subjects": [
+      "C99999",
+      "C99999-K1"
+    ],
+    "total_amount_usd": 1250.5,
+    "activity_dates": [
+      "2016-11-12",
+      "2016-11-13"
+    ]
+  },
+  "stop_reason": "High probability and independent evidence criteria met.",
+  "tool_calls": 5,
+  "tokens": 1800,
+  "latency_s": 1.2
+}
