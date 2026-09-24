@@ -26,20 +26,44 @@ import { BenchmarkCase } from '../types';
 import { GraphVisualizer } from './GraphVisualizer';
 
 interface CaseDetailViewProps {
-  caseData: BenchmarkCase;
+  caseData?: BenchmarkCase;
   allCases: BenchmarkCase[];
   onSelectCase: (caseId: string) => void;
   onBackToQueue: () => void;
   onApproveAction: (caseId: string, actionId: string, approved: boolean) => void;
+  isLoading?: boolean;
+  loadError?: string | null;
 }
+
+const DetailSkeleton: React.FC = () => (
+  <div className="space-y-6" aria-busy="true" aria-label="Loading case investigation">
+    <div className="h-12 rounded-xl bg-stone-100 animate-pulse" />
+    <div className="h-36 rounded-xl bg-stone-100 animate-pulse" />
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      {[1, 2, 3, 4].map((item) => <div key={item} className="h-24 rounded-xl bg-stone-100 animate-pulse" />)}
+    </div>
+    <div className="h-72 rounded-xl bg-stone-100 animate-pulse" />
+  </div>
+);
 
 export const CaseDetailView: React.FC<CaseDetailViewProps> = ({
   caseData,
   allCases,
   onSelectCase,
   onBackToQueue,
-  onApproveAction
+  onApproveAction,
+  isLoading = false,
+  loadError = null,
 }) => {
+  if (isLoading) return <DetailSkeleton />;
+  if (loadError) {
+    return (
+      <div className="rounded-xl border border-rose-200 bg-rose-50 p-6 text-sm text-rose-900">
+        <strong>Investigation unavailable.</strong> {loadError}
+      </div>
+    );
+  }
+  if (!caseData) return null;
   const [activeTab, setActiveTab] = useState<'overview' | 'graph' | 'evidence' | 'policy' | 'sar' | 'history'>('overview');
   const [copiedSar, setCopiedSar] = useState<boolean>(false);
   const [copiedSummary, setCopiedSummary] = useState<boolean>(false);

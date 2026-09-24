@@ -170,7 +170,6 @@ class TigerGraphClient:
     """
 
     def __init__(self) -> None:
-        _require_pytg()
         self._settings = get_settings()
         self._conn = None        # pyTigerGraph.TigerGraphConnection, lazy
         self._resolved_host: str = ""
@@ -204,6 +203,7 @@ class TigerGraphClient:
 
     def _build_conn(self):
         """Build a pyTigerGraph.TigerGraphConnection, obtain a token, return it."""
+        _require_pytg()
         import pyTigerGraph as tg
 
         s = self._settings

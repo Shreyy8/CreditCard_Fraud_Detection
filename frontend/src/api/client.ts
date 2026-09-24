@@ -84,6 +84,10 @@ export interface CaseAnswer {
   audit?: unknown[];
   action_decisions?: Record<string, { status?: string }>;
   explanation?: Record<string, unknown>;
+  subgraph?: {
+    nodes?: unknown[];
+    edges?: unknown[];
+  };
   [key: string]: unknown;
 }
 

@@ -43,6 +43,8 @@ export default function App() {
   const [selectedCaseId, setSelectedCaseId] = useState<string>('HHG-001');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -212,6 +214,8 @@ export default function App() {
 
   const handleRunSelected = async () => {
     if (!currentCase) return;
+    setDetailLoading(true);
+    setDetailError(null);
     setBusyMessage(`Investigating ${currentCase.case_id}…`);
     try {
       const answer = await runInvestigation(currentCase.case_id);
@@ -227,8 +231,10 @@ export default function App() {
       showToast(`Investigation complete for ${mapped.case_id}.`);
     } catch (err) {
       const detail = err instanceof ApiError ? err.detail : 'Investigation failed';
+      setDetailError(detail);
       showToast(detail);
     } finally {
+      setDetailLoading(false);
       setBusyMessage(null);
     }
   };
@@ -330,6 +336,8 @@ export default function App() {
             onSelectCase={handleSelectCase}
             onBackToQueue={() => setActiveTab('queue')}
             onApproveAction={handleApproveAction}
+            isLoading={detailLoading}
+            loadError={detailError}
           />
         )}
 

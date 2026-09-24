@@ -96,6 +96,94 @@ def validate_grounded_llm_output(
     }
 
 
+def _subgraph_node(vertex: dict[str, Any], node_type: str, flagged_id: str = "") -> dict[str, Any] | None:
+    node_id = vertex.get("v_id", vertex.get("id", vertex.get("primary_id", "")))
+    if not node_id:
+        return None
+    node_id = str(node_id)
+    details = {
+        str(key): value for key, value in vertex.items()
+        if key not in {"v_id", "id", "primary_id"}
+    }
+    return {
+        "id": node_id,
+        "type": node_type,
+        "label": node_id,
+        "sublabel": str(details.get("type", "")),
+        "details": details,
+        "isFlagged": node_id == flagged_id,
+    }
+
+
+def _build_subgraph(state: InvestigationState) -> dict[str, list[dict[str, Any]]]:
+    nodes: dict[str, dict[str, Any]] = {}
+    edges: dict[str, dict[str, Any]] = {}
+    context = state.connected_entities.get("tg_txn_context", {}) or {}
+
+    collection_types = {
+        "T": "transaction",
+        "Txns": "transaction",
+        "Cards": "card",
+        "Customers": "customer",
+        "Cust": "customer",
+        "Identities": "email",
+    }
+    for collection, node_type in collection_types.items():
+        for vertex in context.get(collection, []) or []:
+            node = _subgraph_node(vertex, node_type, state.flagged_txn_id)
+            if node:
+                nodes[node["id"]] = node
+
+    seed_nodes = {
+        state.flagged_txn_id: "transaction",
+        state.card_id: "card",
+        state.customer_id: "customer",
+    }
+    for node_id, node_type in seed_nodes.items():
+        if node_id and node_id not in nodes:
+            nodes[node_id] = {
+                "id": node_id,
+                "type": node_type,
+                "label": node_id,
+                "details": {},
+                "isFlagged": node_id == state.flagged_txn_id,
+            }
+
+    def add_edge(source: str, target: str, edge_type: str) -> None:
+        if not source or not target or source not in nodes or target not in nodes:
+            return
+        edge_id = f"{source}:{edge_type}:{target}"
+        edges[edge_id] = {
+            "id": edge_id,
+            "source": source,
+            "target": target,
+            "type": edge_type,
+            "label": edge_type.replace("_", " "),
+        }
+
+    for node_id, node in list(nodes.items()):
+        if node["type"] == "card":
+            add_edge(state.flagged_txn_id, node_id, "transaction_belongs_to_card")
+        elif node["type"] == "customer":
+            add_edge(state.flagged_txn_id, node_id, "transaction_belongs_to_customer")
+        elif node["type"] == "email":
+            add_edge(state.flagged_txn_id, node_id, "transaction_has_identity")
+
+    for card_id in state.connected_entities.get("connected_cards", []) or []:
+        card_id = str(card_id)
+        if card_id not in nodes:
+            nodes[card_id] = {
+                "id": card_id,
+                "type": "card",
+                "label": card_id,
+                "details": {},
+                "ringMember": True,
+            }
+        add_edge(state.card_id, card_id, "connected_card")
+
+    return {"nodes": list(nodes.values()), "edges": list(edges.values())}
+
+
 class FraudAgent:
     """
     Stateful fraud investigation agent.
@@ -1356,6 +1444,7 @@ class FraudAgent:
                 "remaining_uncertainty": list(state.uncertainty_flags),
                 "stop_reason": state.stop_reason,
             },
+            subgraph=_build_subgraph(state),
         )
 
     def _generate_summary(self, state: InvestigationState, exposure) -> str:

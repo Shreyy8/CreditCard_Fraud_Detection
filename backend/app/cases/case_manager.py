@@ -110,6 +110,7 @@ class CaseManager:
             "tool_calls": answer.tool_calls,
             "tokens": answer.tokens,
             "latency_s": answer.latency_s,
+            "subgraph": answer.subgraph.model_dump(mode="json"),
         }
 
     def write_answer_file(self, answer: CaseAnswer) -> Path:

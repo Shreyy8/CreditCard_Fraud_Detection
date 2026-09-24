@@ -3,11 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export type CaseId =
-  | 'HHG-001' | 'HHG-002' | 'HHG-003' | 'HHG-004' | 'HHG-005'
-  | 'HHG-006' | 'HHG-007' | 'HHG-008' | 'HHG-009' | 'HHG-010'
-  | 'HHG-011' | 'HHG-012' | 'HHG-013' | 'HHG-014' | 'HHG-015'
-  | 'HHG-016' | 'HHG-017' | 'HHG-018' | 'HHG-019' | 'HHG-020';
+export type CaseId = string;
 
 export type TriggerType = 'risk_score' | 'customer_report' | 'analyst_request';
 

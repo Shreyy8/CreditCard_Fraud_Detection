@@ -13,6 +13,7 @@ import {
   Route,
   TriggerType,
   Verdict,
+  SubgraphData,
 } from '../types';
 import type { CaseAnswer } from './client';
 
@@ -200,6 +201,17 @@ function confidenceFrom(evidenceCount: number, probability: number): 'High' | 'M
   return 'Low';
 }
 
+function mapSubgraph(raw: CaseAnswer, fallback?: BenchmarkCase): SubgraphData {
+  const value = raw.subgraph;
+  if (value && Array.isArray(value.nodes) && Array.isArray(value.edges)) {
+    return {
+      nodes: value.nodes as SubgraphData['nodes'],
+      edges: value.edges as SubgraphData['edges'],
+    };
+  }
+  return fallback?.subgraph || { nodes: [], edges: [] };
+}
+
 export function mapCaseAnswer(raw: CaseAnswer): BenchmarkCase {
   const fallback = getCaseById(raw.case_id);
   const trigger = (raw.trigger && typeof raw.trigger === 'object' ? raw.trigger : {}) as Record<string, unknown>;
@@ -283,7 +295,7 @@ export function mapCaseAnswer(raw: CaseAnswer): BenchmarkCase {
     tool_calls: asNumber(raw.tool_calls, fallback?.tool_calls ?? 0),
     tokens: asNumber(raw.tokens, fallback?.tokens ?? 0),
     latency_s: asNumber(raw.latency_s, fallback?.latency_s ?? 0),
-    subgraph: fallback?.subgraph || { nodes: [], edges: [] },
+    subgraph: mapSubgraph(raw, fallback),
     affected_txns_detail: mapTransactions(affectedIds, fallback?.affected_txns_detail),
     prior_cases_detail: (fallback?.prior_cases_detail || []) as PriorCase[],
     timeline: fallback?.timeline || [],

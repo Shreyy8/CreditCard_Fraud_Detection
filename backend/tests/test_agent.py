@@ -5,8 +5,8 @@ These tests run without TigerGraph connectivity.
 
 import asyncio
 import pytest
-from app.agents.fraud_agent import FraudAgent
-from app.models.case import CaseStatus, Verdict, FraudPattern
+from app.agents.fraud_agent import FraudAgent, _build_subgraph
+from app.models.case import CaseStatus, FraudPattern, InvestigationState, Verdict
 
 
 @pytest.fixture
@@ -38,6 +38,29 @@ def customer_report_row():
 
 
 class TestFraudAgentWorkflow:
+    def test_subgraph_is_built_from_investigation_context(self):
+        state = InvestigationState(
+            case_id="HHG-001",
+            trigger_type="risk_score",
+            trigger_text="test",
+            flagged_txn_id="T-1",
+            card_id="C-1",
+            customer_id="U-1",
+            connected_entities={
+                "tg_txn_context": {
+                    "T": [{"v_id": "T-1", "amount": 10.0}],
+                    "Cards": [{"v_id": "C-1"}],
+                    "Customers": [{"v_id": "U-1"}],
+                },
+                "connected_cards": ["C-2"],
+            },
+        )
+
+        subgraph = _build_subgraph(state)
+
+        assert {node["id"] for node in subgraph["nodes"]} >= {"T-1", "C-1", "C-2", "U-1"}
+        assert subgraph["edges"]
+
     def test_investigation_returns_case_answer(self, sample_case_row):
         agent = FraudAgent()
         answer = asyncio.run(agent.investigate(sample_case_row))

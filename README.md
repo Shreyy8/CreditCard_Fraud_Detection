@@ -706,6 +706,8 @@ Streamlit app (`ui/app.py`) covering the brief's requirement to show the investi
 
 Separate folder `autonomous/` (**counts toward Innovation, not accuracy**): the agent scans the exam period on its own, picks up alerts from risk scores, and investigates beyond the 20 cases. Suggested: rank cards by graph signals (shared new device profiles, structuring under $500, out-of-region bursts), run the same policy-bound investigation loop, and write outputs in the same answer format. Do not mix these files into `cases/`.
 
+Benchmark answer files in `cases/` are the grading source of truth. Runtime API artifacts in `output/` are derived operational data and must not be used as a second benchmark submission.
+
 ---
 
 ## 17. Build order

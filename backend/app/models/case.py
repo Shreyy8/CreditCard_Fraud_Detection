@@ -149,6 +149,11 @@ class CaseRecord(BaseModel):
     graph_case_id: str = ""
 
 
+class SubgraphData(BaseModel):
+    nodes: list[dict[str, Any]] = Field(default_factory=list)
+    edges: list[dict[str, Any]] = Field(default_factory=list)
+
+
 # ── Top-level answer file ────────────────────────────────────────────────────
 
 
@@ -177,6 +182,7 @@ class CaseAnswer(BaseModel):
     initial_assessment: dict[str, Any] = Field(default_factory=dict)
     reassessment_history: list[dict[str, Any]] = Field(default_factory=list)
     explanation: dict[str, Any] = Field(default_factory=dict)
+    subgraph: SubgraphData = Field(default_factory=SubgraphData)
 
 
 # ── Internal investigation state (not in the answer file) ────────────────────

@@ -129,5 +129,5 @@ def write_case_json_files(case_pack_csv: str, output_dir: str = "cases"):
 
         print(f"Created {output_file}")
 
-# Example usage
-write_case_json_files("DataSet/case_pack.csv", "output")
+if __name__ == "__main__":
+    write_case_json_files("DataSet/case_pack.csv", "cases")
