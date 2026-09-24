@@ -188,5 +188,9 @@
   "stop_reason": "Investigation completed \u2014 all applicable policy rules evaluated.",
   "tool_calls": 21,
   "tokens": 0,
-  "latency_s": 4.4
+  "latency_s": 4.4,
+  "subgraph": {
+    "nodes": [],
+    "edges": []
+  }
 }

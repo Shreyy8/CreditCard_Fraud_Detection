@@ -198,5 +198,9 @@
   "stop_reason": "Customer response 'denied' settled the question.",
   "tool_calls": 22,
   "tokens": 0,
-  "latency_s": 4.34
+  "latency_s": 4.34,
+  "subgraph": {
+    "nodes": [],
+    "edges": []
+  }
 }

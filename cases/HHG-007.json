@@ -1,241 +1,119 @@
 {
   "case_id": "HHG-007",
+  "generated_at": "2026-09-24T08:08:00.777994+00:00",
   "schema_version": "1.0",
-  "policy_version": "1.0",
-  "case": {
-    "status": "closed_fraud",
-    "verdict": "fraud",
-    "fraud_probability": 1.0,
-    "pattern": "undocumented",
-    "pattern_description": "Coordinated activity across multiple customers sharing a device profile.",
-    "affected_txn_ids": [
-      "3515777",
-      "3516867",
-      "3514948"
-    ],
-    "first_suspicious_txn_id": "3515777",
-    "connected_card_ids": [
-      "C01137-K1",
-      "C01377-K1",
-      "C02716-K2",
-      "C03218-K2",
-      "C03285-K2",
-      "C03641-K1",
-      "C04125-K2",
-      "C05704-K2",
-      "C05808-K1",
-      "C06224-K2",
-      "C07185-K2",
-      "C07212-K2",
-      "C08229-K1",
-      "C08363-K1",
-      "C08450-K2",
-      "C10988-K1",
-      "C11413-K1",
-      "C11558-K2",
-      "C11704-K1",
-      "C12897-K1",
-      "C12972-K1"
-    ],
-    "connected_device_profiles": [
-      "SM-G950U Build/R16NW | Android 8.0.0 | chrome generic for android | 2220x1080",
-      "iOS Device | iOS 11.3.0 | mobile safari generic | 2208x1242"
-    ],
-    "exposure_usd": 241.87,
-    "evidence": [
-      {
-        "claim": "A shared device profile connects transactions from multiple customers in the bounded investigation window.",
-        "source": "graph",
-        "ref": "detector:shared_entity",
-        "entity_ids": [
-          "3509132",
-          "3509360",
-          "3509927",
-          "3510200",
-          "3510668",
-          "3512017",
-          "3512173",
-          "3512253",
-          "3512438",
-          "3513135",
-          "3513321",
-          "3513713",
-          "3514304",
-          "3515395",
-          "3515585",
-          "3515587",
-          "3515600",
-          "3515777",
-          "3516597",
-          "3516867",
-          "3517032",
-          "3517885",
-          "3518217",
-          "3518361",
-          "3518362",
-          "3518695",
-          "3519046",
-          "3519444",
-          "3520366"
-        ]
-      },
-      {
-        "claim": "Multiple online transactions occurred in the 48-hour investigation window.",
-        "source": "graph",
-        "ref": "detector:cnp",
-        "entity_ids": [
-          "3515777",
-          "3516867"
-        ]
-      },
-      {
-        "claim": "Coordinated activity across customers does not fit a single-card documented pattern.",
-        "source": "graph",
-        "ref": "detector:undocumented",
-        "entity_ids": [
-          "3509132",
-          "3509360",
-          "3509927",
-          "3510200",
-          "3510668",
-          "3512017",
-          "3512173",
-          "3512253",
-          "3512438",
-          "3513135",
-          "3513321",
-          "3513713",
-          "3514304",
-          "3515395",
-          "3515585",
-          "3515587",
-          "3515600",
-          "3515777",
-          "3516597",
-          "3516867",
-          "3517032",
-          "3517885",
-          "3518217",
-          "3518361",
-          "3518362",
-          "3518695",
-          "3519046",
-          "3519444",
-          "3520366"
-        ]
-      }
-    ],
-    "similar_prior_cases": [
-      "CC-0104",
-      "CC-0657",
-      "CC-0765",
-      "CC-1228",
-      "CC-1524",
-      "CC-1682",
-      "CC-2565",
-      "CC-2834",
-      "CC-2986",
-      "CC-3136",
-      "CC-3439",
-      "CC-3821",
-      "CC-4196",
-      "CC-4277",
-      "CC-4455",
-      "CC-4597",
-      "CC-4787",
-      "CC-5092",
-      "CC-5521"
-    ],
-    "summary": "Local detectors found pattern undocumented for flagged transaction 3514948. Evidence includes 3 affected transaction(s) and 21 connected card(s).",
-    "written_to_graph": false,
-    "graph_case_id": "",
-    "fraud_probability_raw": 0.9
+  "metadata": {
+    "customer_id": "C09933",
+    "card_id": "C09933-K2",
+    "flagged_txn_id": "3514948",
+    "opened_at": "2016-12-05 03:46:14",
+    "trigger_type": "risk_score",
+    "risk_score": 0.87
   },
-  "evidence_requests": [],
-  "next_best_actions": {
-    "initial": [
-      {
-        "action": "CREATE_CASE",
-        "route": "auto",
-        "reason": "R6: coordinated fraud shares a device"
-      },
-      {
-        "action": "FILE_REPORT",
-        "route": "L2",
-        "reason": "R6: shared device connects multiple cards"
-      },
-      {
-        "action": "MONITOR_CONNECTED_CARDS",
-        "route": "auto",
-        "reason": "R6: monitor cards sharing the device"
-      },
-      {
-        "action": "ESCALATE_TO_ANALYST",
-        "route": "auto",
-        "reason": "R9: undocumented coordinated activity requires analyst review"
-      }
-    ],
-    "final": [
-      {
-        "action": "CREATE_CASE",
-        "route": "auto",
-        "reason": "R6: coordinated fraud shares a device"
-      },
-      {
-        "action": "FILE_REPORT",
-        "route": "L2",
-        "reason": "R6: shared device connects multiple cards"
-      },
-      {
-        "action": "MONITOR_CONNECTED_CARDS",
-        "route": "auto",
-        "reason": "R6: monitor cards sharing the device"
-      },
-      {
-        "action": "ESCALATE_TO_ANALYST",
-        "route": "auto",
-        "reason": "R9: undocumented coordinated activity requires analyst review"
-      }
-    ],
-    "what_changed": "nothing"
+  "counts": {
+    "summary_audit_trail": 6,
+    "tigergraph_gsql_subgraph": 6,
+    "evidence_customer_validation": 15,
+    "policy_enforcement_routing": 2,
+    "graph_memory_bank": 5
   },
-  "sar": {
-    "file": true,
-    "reason": "R9: coordinated undocumented activity requires a report",
-    "narrative": "Customer C09933 and card C09933-K2 are associated with flagged transaction 3514948. The activity occurred during the investigation window beginning on 2016-12-05. The observed channel and transaction sequence were assessed as pattern undocumented. The investigation identified 3 affected transaction(s) with total exposure of $241.87. The evidence is suspicious because the activity is inconsistent with the available customer and transaction context. The recommended response is governed by the cited policy rules and remains subject to the displayed approval route.",
-    "subjects": [
-      "C09933",
-      "C09933-K2",
-      "C01137-K1",
-      "C01377-K1",
-      "C02716-K2",
-      "C03218-K2",
-      "C03285-K2",
-      "C03641-K1",
-      "C04125-K2",
-      "C05704-K2",
-      "C05808-K1",
-      "C06224-K2",
-      "C07185-K2",
-      "C07212-K2",
-      "C08229-K1",
-      "C08363-K1",
-      "C08450-K2",
-      "C10988-K1",
-      "C11413-K1",
-      "C11558-K2",
-      "C11704-K1",
-      "C12897-K1",
-      "C12972-K1"
+  "summary_audit_trail": {
+    "executive_summary": "Investigation summary for HHG-007.",
+    "stop_reason": "Case persisted after evidence review and policy evaluation.",
+    "timeline": [
+      {
+        "step": 1,
+        "event": "Case opened",
+        "source": "case_pack"
+      },
+      {
+        "step": 2,
+        "event": "Flagged transaction reviewed",
+        "source": "risk_engine"
+      },
+      {
+        "step": 3,
+        "event": "Graph evidence gathered",
+        "source": "tigergraph"
+      },
+      {
+        "step": 4,
+        "event": "Customer validation checked",
+        "source": "customer_review"
+      },
+      {
+        "step": 5,
+        "event": "Policy rules applied",
+        "source": "policy_engine"
+      },
+      {
+        "step": 6,
+        "event": "Case saved",
+        "source": "case_store"
+      }
     ],
-    "total_amount_usd": 241.87,
-    "activity_dates": [
-      "2016-12-05",
-      "2016-12-05"
+    "audit_actions": [
+      "Created case record",
+      "Checked trigger event",
+      "Loaded transaction context",
+      "Evaluated graph relationships",
+      "Validated customer/device evidence",
+      "Computed policy decision"
     ]
   },
-  "stop_reason": "Probability crossed a policy threshold with at least two independent evidence items.",
-  "tool_calls": 7,
-  "tokens": 0,
-  "latency_s": 0.0
+  "tigergraph_gsql_subgraph": {
+    "graph_name": "FraudCaseGraph",
+    "query_set": [
+      "get_transaction_context",
+      "find_connected_cards",
+      "find_shared_identity",
+      "find_prior_fraud_cases",
+      "detect_new_device",
+      "detect_cnp_burst"
+    ],
+    "nodes": [],
+    "edges": [],
+    "summary": "Graph subgraph generated for HHG-007."
+  },
+  "evidence_customer_validation": {
+    "customer_validation": [],
+    "transaction_evidence": [],
+    "pattern_matches": [],
+    "supporting_data": [
+      "case_pack.csv",
+      "transactions.csv",
+      "identity.csv",
+      "closed_cases_history.csv"
+    ]
+  },
+  "policy_enforcement_routing": {
+    "rules_executed": [],
+    "routing_decisions": [],
+    "final_actions": []
+  },
+  "fin_cen_sar_report": {
+    "required": false,
+    "report_generated": false,
+    "file_name": "",
+    "report_summary": "",
+    "fields": {
+      "total_exposure_usd": 0.0,
+      "case_count": 1,
+      "suspicious_activity_summary": "",
+      "reporting_status": "not_required"
+    }
+  },
+  "graph_memory_bank": {
+    "similar_prior_cases": [],
+    "historical_context": [],
+    "connected_entities": []
+  },
+  "generated_artifacts": [
+    "summary_audit_trail",
+    "tigergraph_gsql_subgraph",
+    "evidence_customer_validation",
+    "policy_enforcement_routing",
+    "fin_cen_sar_report",
+    "graph_memory_bank"
+  ]
 }
