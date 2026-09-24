@@ -16,6 +16,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -27,6 +28,21 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
 OUTPUT_DIR = Path(__file__).parent.parent / "cases"
+
+
+def _generation_meta() -> dict[str, str]:
+    try:
+        code_version = subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"],
+            cwd=OUTPUT_DIR.parent,
+            text=True,
+        ).strip()
+    except (OSError, subprocess.CalledProcessError):
+        code_version = "unknown"
+    return {
+        "code_version": code_version,
+        "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+    }
 
 
 async def investigate_all(case_ids: list[str] | None = None) -> dict:
@@ -68,8 +84,10 @@ async def investigate_all(case_ids: list[str] | None = None) -> dict:
             mgr.save_answer(answer)
             # Write answer file
             out_path = OUTPUT_DIR / f"{case_id}.json"
+            document = answer.model_dump(mode="json")
+            document["generation_meta"] = _generation_meta()
             with open(out_path, "w", encoding="utf-8") as f:
-                f.write(answer.model_dump_json(indent=2))
+                json.dump(document, f, indent=2)
             elapsed = round(time.monotonic() - t0, 2)
             summary["results"][case_id] = {
                 "status": answer.case.status.value,
