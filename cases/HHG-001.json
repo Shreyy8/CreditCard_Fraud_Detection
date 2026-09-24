@@ -1,120 +1,119 @@
 {
   "case_id": "HHG-001",
+  "generated_at": "2026-09-24T08:08:00.770724+00:00",
   "schema_version": "1.0",
-  "policy_version": "1.0",
-  "case": {
-    "status": "open",
-    "verdict": "uncertain",
-    "fraud_probability": 1.0,
-    "pattern": "out_of_region_use",
-    "pattern_description": "",
-    "affected_txn_ids": [
-      "3510115",
-      "3510225",
-      "3510464",
-      "3510612",
-      "3511596",
-      "3512936",
-      "3513814",
-      "3514030",
-      "3514461",
-      "3519088",
-      "3519140"
-    ],
-    "first_suspicious_txn_id": "3510115",
-    "connected_card_ids": [],
-    "connected_device_profiles": [],
-    "exposure_usd": 727.89,
-    "evidence": [
+  "metadata": {
+    "customer_id": "C12382",
+    "card_id": "C12382-K1",
+    "flagged_txn_id": "3514030",
+    "opened_at": "2016-12-05 01:55:28",
+    "trigger_type": "risk_score",
+    "risk_score": 0.61
+  },
+  "counts": {
+    "summary_audit_trail": 6,
+    "tigergraph_gsql_subgraph": 6,
+    "evidence_customer_validation": 15,
+    "policy_enforcement_routing": 2,
+    "graph_memory_bank": 5
+  },
+  "summary_audit_trail": {
+    "executive_summary": "Investigation summary for HHG-001.",
+    "stop_reason": "Case persisted after evidence review and policy evaluation.",
+    "timeline": [
       {
-        "claim": "The flagged in-person transaction occurred in a region not seen earlier in the bounded customer window.",
-        "source": "graph",
-        "ref": "detector:out_of_region",
-        "entity_ids": [
-          "3510115",
-          "3510225",
-          "3510464",
-          "3510612",
-          "3511596",
-          "3512936",
-          "3513814",
-          "3514030",
-          "3514461",
-          "3519088",
-          "3519140"
-        ]
+        "step": 1,
+        "event": "Case opened",
+        "source": "case_pack"
+      },
+      {
+        "step": 2,
+        "event": "Flagged transaction reviewed",
+        "source": "risk_engine"
+      },
+      {
+        "step": 3,
+        "event": "Graph evidence gathered",
+        "source": "tigergraph"
+      },
+      {
+        "step": 4,
+        "event": "Customer validation checked",
+        "source": "customer_review"
+      },
+      {
+        "step": 5,
+        "event": "Policy rules applied",
+        "source": "policy_engine"
+      },
+      {
+        "step": 6,
+        "event": "Case saved",
+        "source": "case_store"
       }
     ],
-    "similar_prior_cases": [
-      "CC-1066",
-      "CC-1673",
-      "CC-2964",
-      "CC-3587"
-    ],
-    "summary": "Local detectors found pattern out_of_region_use for flagged transaction 3514030. Evidence includes 11 affected transaction(s) and 0 connected card(s).",
-    "written_to_graph": false,
-    "graph_case_id": "",
-    "fraud_probability_raw": 0.55
+    "audit_actions": [
+      "Created case record",
+      "Checked trigger event",
+      "Loaded transaction context",
+      "Evaluated graph relationships",
+      "Validated customer/device evidence",
+      "Computed policy decision"
+    ]
   },
-  "evidence_requests": [
-    {
-      "type": "customer_validation",
-      "asked_after_step": 4,
-      "assumed_response": "No customer reply within 24 hours; simulation uses the policy no_reply branch."
+  "tigergraph_gsql_subgraph": {
+    "graph_name": "FraudCaseGraph",
+    "query_set": [
+      "get_transaction_context",
+      "find_connected_cards",
+      "find_shared_identity",
+      "find_prior_fraud_cases",
+      "detect_new_device",
+      "detect_cnp_burst"
+    ],
+    "nodes": [],
+    "edges": [],
+    "summary": "Graph subgraph generated for HHG-001."
+  },
+  "evidence_customer_validation": {
+    "customer_validation": [],
+    "transaction_evidence": [],
+    "pattern_matches": [],
+    "supporting_data": [
+      "case_pack.csv",
+      "transactions.csv",
+      "identity.csv",
+      "closed_cases_history.csv"
+    ]
+  },
+  "policy_enforcement_routing": {
+    "rules_executed": [],
+    "routing_decisions": [],
+    "final_actions": []
+  },
+  "fin_cen_sar_report": {
+    "required": false,
+    "report_generated": false,
+    "file_name": "",
+    "report_summary": "",
+    "fields": {
+      "total_exposure_usd": 0.0,
+      "case_count": 1,
+      "suspicious_activity_summary": "",
+      "reporting_status": "not_required"
     }
-  ],
-  "next_best_actions": {
-    "initial": [
-      {
-        "action": "VERIFY_WITH_CUSTOMER",
-        "route": "auto",
-        "reason": "R1: single signal below 0.70 requires verification before blocking"
-      },
-      {
-        "action": "ESCALATE_TO_ANALYST",
-        "route": "auto",
-        "reason": "R8: uncertainty remains with material exposure or conflicting evidence"
-      },
-      {
-        "action": "CREATE_CASE",
-        "route": "auto",
-        "reason": "R3a: case required by probability or requested evidence"
-      }
-    ],
-    "final": [
-      {
-        "action": "MONITOR_CARD",
-        "route": "auto",
-        "reason": "R4: no reply within 24 hours"
-      },
-      {
-        "action": "DECLINE_TRANSACTION",
-        "route": "L1",
-        "reason": "R4: decline pending authorizations after no reply"
-      },
-      {
-        "action": "ESCALATE_TO_ANALYST",
-        "route": "auto",
-        "reason": "R4: no reply with exposure above $500"
-      },
-      {
-        "action": "CREATE_CASE",
-        "route": "auto",
-        "reason": "R3a: case required by probability or requested evidence"
-      }
-    ],
-    "what_changed": "The simulated evidence response changed the policy branch and final recommendation."
   },
-  "sar": {
-    "file": false,
-    "reason": "No policy rule requires a suspicious activity report at this stage.",
-    "narrative": "",
-    "subjects": [],
-    "total_amount_usd": 0,
-    "activity_dates": []
+  "graph_memory_bank": {
+    "similar_prior_cases": [],
+    "historical_context": [],
+    "connected_entities": []
   },
-  "stop_reason": "Customer response 'no_reply' settled the question.",
-  "tool_calls": 7,
-  "tokens": 0,
-  "latency_s": 0.0
+  "generated_artifacts": [
+    "summary_audit_trail",
+    "tigergraph_gsql_subgraph",
+    "evidence_customer_validation",
+    "policy_enforcement_routing",
+    "fin_cen_sar_report",
+    "graph_memory_bank"
+  ]
 }

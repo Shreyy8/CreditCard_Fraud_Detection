@@ -192,5 +192,9 @@
   "stop_reason": "Fraud probability 0.86 >= 0.85 with 22 independent evidence pieces (Policy section 6).",
   "tool_calls": 21,
   "tokens": 0,
-  "latency_s": 6.79
+  "latency_s": 6.79,
+  "subgraph": {
+    "nodes": [],
+    "edges": []
+  }
 }
